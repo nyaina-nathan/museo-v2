@@ -1,0 +1,559 @@
+openapi: 3.1.0
+info:
+  title: Museo API
+  description: API for managing users, jerseys, and jersey images.
+  version: 1.0.0
+servers:
+  - url: /
+paths:
+  /api/auth/register:
+    post:
+      operationId: register
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterInput'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/auth/login:
+    post:
+      operationId: login
+      tags:
+        - Auth
+      summary: Log in and start a session
+      description: Sets an HttpOnly session cookie on success.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInput'
+      responses:
+        '200':
+          description: Logged in, session cookie set
+          headers:
+            Set-Cookie:
+              description: HttpOnly session cookie
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/me:
+    get:
+      operationId: getCurrentUser
+      tags:
+        - Auth
+      summary: Get the currently authenticated user
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/logout:
+    post:
+      operationId: logout
+      tags:
+        - Auth
+      summary: Log out and end the session
+      description: Clears the session cookie.
+      responses:
+        '204':
+          description: Logged out, session cookie cleared
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/jerseys:
+    get:
+      operationId: listJerseys
+      tags:
+        - Jerseys
+      summary: List jerseys
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by jersey name (partial match)
+        - name: priceMin
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Only include jerseys with price greater than or equal to this value
+        - name: priceMax
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Only include jerseys with price less than or equal to this value
+        - name: isPublic
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by public/private visibility
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Page of jerseys
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - page
+                  - limit
+                  - total
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Jersey'
+                  page:
+                    type: integer
+                    minimum: 1
+                  limit:
+                    type: integer
+                    minimum: 1
+                  total:
+                    type: integer
+                    minimum: 0
+    post:
+      operationId: createJersey
+      tags:
+        - Jerseys
+      summary: Create a jersey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JerseyInput'
+      responses:
+        '201':
+          description: Jersey created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Jersey'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/jerseys/{jerseyId}:
+    parameters:
+      - $ref: '#/components/parameters/JerseyId'
+    get:
+      operationId: getJersey
+      tags:
+        - Jerseys
+      summary: Get a jersey
+      responses:
+        '200':
+          description: Jersey
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Jersey'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: updateJersey
+      tags:
+        - Jerseys
+      summary: Update a jersey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JerseyPatchInput'
+      responses:
+        '200':
+          description: Jersey updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Jersey'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      operationId: deleteJersey
+      tags:
+        - Jerseys
+      summary: Delete a jersey
+      description: Cascades to the jersey's images.
+      responses:
+        '204':
+          description: Jersey deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/jerseys/{jerseyId}/images:
+    parameters:
+      - $ref: '#/components/parameters/JerseyId'
+    get:
+      operationId: listJerseyImages
+      tags:
+        - Jersey Images
+      summary: List images of a jersey
+      responses:
+        '200':
+          description: Images of the jersey
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JerseyImage'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      operationId: createJerseyImage
+      tags:
+        - Jersey Images
+      summary: Upload an image for a jersey
+      description: >-
+        The file is stored server-side and its resulting URL is exposed via the
+        `url` field of the returned resource. If `title` is omitted, the file
+        name is used.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  contentEncoding: binary
+                  format: binary
+                  description: Image file (image/png, image/jpeg, image/webp, image/gif)
+                title:
+                  type: string
+                  maxLength: 255
+                  description: Optional display title, defaults to the file name
+      responses:
+        '201':
+          description: Image uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JerseyImage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/jerseys/{jerseyId}/images/{imageId}:
+    parameters:
+      - $ref: '#/components/parameters/JerseyId'
+      - $ref: '#/components/parameters/ImageId'
+    get:
+      operationId: getJerseyImage
+      tags:
+        - Jersey Images
+      summary: Get a single jersey image
+      responses:
+        '200':
+          description: Jersey image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JerseyImage'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteJerseyImage
+      tags:
+        - Jersey Images
+      summary: Delete a jersey image
+      responses:
+        '204':
+          description: Jersey image deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    JerseyId:
+      name: jerseyId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ImageId:
+      name: imageId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    BadRequest:
+      description: Malformed request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid session
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Resource already exists
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - username
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+          maxLength: 100
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+
+    RegisterInput:
+      type: object
+      required:
+        - email
+        - username
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+          minLength: 1
+          maxLength: 100
+        password:
+          type: string
+          format: password
+          minLength: 8
+
+    LoginInput:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    Jersey:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type:
+            - string
+            - 'null'
+        is_public:
+          type: boolean
+          default: true
+        price:
+          type:
+            - integer
+            - 'null'
+          minimum: 1
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+
+    JerseyInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type:
+            - string
+            - 'null'
+        is_public:
+          type: boolean
+          default: true
+        price:
+          type:
+            - integer
+            - 'null'
+          minimum: 1
+
+    JerseyPatchInput:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type:
+            - string
+            - 'null'
+        is_public:
+          type: boolean
+        price:
+          type:
+            - integer
+            - 'null'
+          minimum: 1
+
+    JerseyImage:
+      type: object
+      required:
+        - id
+        - id_jersey
+        - title
+        - url
+      properties:
+        id:
+          type: string
+          format: uuid
+        id_jersey:
+          type: string
+          format: uuid
+        title:
+          type: string
+        url:
+          type: string
+          format: uri
+          readOnly: true
+          description: Assigned by the server after storing the uploaded file
+
+tags:
+  - name: Auth
+    description: User registration and session management
+  - name: Jerseys
+    description: CRUD for jerseys
+  - name: Jersey Images
+    description: Image uploads attached to a jersey
