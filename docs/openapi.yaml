@@ -391,10 +391,18 @@ components:
     Error:
       type: object
       required:
+        - title
         - message
+        - status
       properties:
+        title:
+          type: string
         message:
           type: string
+        origin:
+          type: string
+        status:
+          type: integer
         details:
           type: object
           additionalProperties: true
