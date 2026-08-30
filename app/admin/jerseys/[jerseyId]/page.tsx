@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useImageKitUpload } from "@/hooks/useImageKitUpload";
 import type { Jersey, JerseyImage } from "@/types/jersey.types";
@@ -30,7 +30,12 @@ export default function JerseyDetailPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploadTitle, setUploadTitle] = useState("");
+  const [previewImage, setPreviewImage] = useState<JerseyImage | null>(null);
 
   const loadImages = useCallback(async () => {
     try {
@@ -147,14 +152,48 @@ export default function JerseyDetailPage() {
     }
   }
 
-  async function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
+  function openUploadModal() {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setUploadTitle("");
+    setUploadError(null);
+    setShowUploadModal(true);
+  }
+
+  function closeUploadModal() {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setUploadTitle("");
+    setUploadError(null);
+    setShowUploadModal(false);
+  }
+
+  function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
     if (!file) return;
 
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    setUploadError(null);
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setUploadTitle(file.name.replace(/\.[^.]+$/, ""));
+  }
+
+  async function handleUploadSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!selectedFile) return;
+
     setUploadError(null);
 
-    const uploaded = await uploadFile(file);
+    const uploaded = await uploadFile(selectedFile);
 
     if (!uploaded) {
       setUploadError("Upload failed");
@@ -168,6 +207,7 @@ export default function JerseyDetailPage() {
         body: JSON.stringify({
           url: uploaded.url,
           file_id: uploaded.fileId ?? null,
+          ...(uploadTitle.trim() ? { title: uploadTitle.trim() } : {}),
         }),
       });
 
@@ -176,13 +216,10 @@ export default function JerseyDetailPage() {
         throw new Error(body?.message ?? "Failed to save image");
       }
 
+      closeUploadModal();
       await loadImages();
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
     }
   }
 
@@ -347,21 +384,15 @@ export default function JerseyDetailPage() {
       </form>
 
       <section>
-        <h2 className="mb-4 font-display text-2xl font-bold text-primary">
-          Imagery
-        </h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-display text-2xl font-bold text-primary">
+            Imagery
+          </h2>
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleUpload}
-          className="mb-4 text-sm text-text-light"
-        />
-
-        {uploading && <p className="text-text-light">Uploading...</p>}
-
-        {uploadError && <p className="text-sm text-primary-dark">{uploadError}</p>}
+          <Button size="sm" onClick={openUploadModal}>
+            Upload new photo
+          </Button>
+        </div>
 
         {images.length === 0 ? (
           <p className="text-text-light">
@@ -371,12 +402,19 @@ export default function JerseyDetailPage() {
           <ul className="grid grid-cols-2 gap-6">
             {images.map((image) => (
               <li key={image.id} className="stamp-border my-2 bg-white p-3">
-                <img
-                  src={image.url}
-                  alt={image.title}
-                  width={300}
-                  className="mb-2 h-40 w-full rounded object-cover"
-                />
+                <button
+                  type="button"
+                  onClick={() => setPreviewImage(image)}
+                  className="mb-2 block w-full cursor-zoom-in"
+                  aria-label={`Preview ${image.title}`}
+                >
+                  <img
+                    src={image.url}
+                    alt={image.title}
+                    width={300}
+                    className="h-40 w-full rounded object-cover"
+                  />
+                </button>
 
                 {editingImageId === image.id ? (
                   <div className="flex flex-col gap-1">
@@ -429,6 +467,110 @@ export default function JerseyDetailPage() {
           </ul>
         )}
       </section>
+
+      {showUploadModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6"
+          onClick={closeUploadModal}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Upload a new photo"
+        >
+          <form
+            onSubmit={handleUploadSubmit}
+            onClick={(event) => event.stopPropagation()}
+            className="flex w-full max-w-md flex-col gap-4 rounded-lg border border-border bg-white p-6"
+          >
+            <h2 className="font-display text-xl font-bold text-primary">
+              Upload a new photo
+            </h2>
+
+            <div className="flex flex-col items-center gap-3 rounded border border-dashed border-primary/40 bg-primary/5 p-4">
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="Selected photo preview"
+                  width={300}
+                  className="h-40 w-full rounded object-contain"
+                />
+              ) : (
+                <p className="text-sm text-text-light">
+                  Select an image to add to this piece
+                </p>
+              )}
+
+              <label className="cursor-pointer text-sm font-medium text-primary underline">
+                {previewUrl ? "Choose a different image" : "Select an image"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium">Title</span>
+              <input
+                value={uploadTitle}
+                onChange={(e) => setUploadTitle(e.target.value)}
+                placeholder="Optional"
+                className={inputStyles}
+              />
+            </label>
+
+            {uploadError && (
+              <p className="text-sm text-primary-dark">{uploadError}</p>
+            )}
+
+            <div className="flex gap-2">
+              <Button
+                type="submit"
+                disabled={!selectedFile || uploading}
+              >
+                {uploading ? "Uploading..." : "Add photo"}
+              </Button>
+
+              <Button
+                variant="secondary"
+                type="button"
+                onClick={closeUploadModal}
+                disabled={uploading}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-6"
+          onClick={() => setPreviewImage(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Preview ${previewImage.title}`}
+        >
+          <img
+            src={previewImage.url}
+            alt={previewImage.title}
+            className="max-h-full max-w-full rounded object-contain"
+            onClick={(event) => event.stopPropagation()}
+          />
+
+          <div className="mt-4 flex items-center gap-4">
+            <span className="text-sm text-white/80">{previewImage.title}</span>
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="rounded border border-white/40 px-4 py-2 text-sm text-white hover:bg-white hover:text-primary"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
