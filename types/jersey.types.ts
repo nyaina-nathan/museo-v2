@@ -44,10 +44,12 @@ export interface JerseyImage {
   title: string;
   url: string;
   file_id: string | null;
+  is_primary: boolean;
 }
 
 export interface JerseyImageInput {
   title?: string;
   url: string;
   file_id?: string | null;
+  is_primary?: boolean;
 }

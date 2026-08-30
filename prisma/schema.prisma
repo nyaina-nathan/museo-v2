@@ -8,12 +8,13 @@ datasource db {
 }
 
 model jersey_images {
-  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  id_jersey String  @db.Uuid
-  title     String
-  url       String
-  file_id   String? @db.VarChar
-  jerseys   jerseys @relation(fields: [id_jersey], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_jersey  String   @db.Uuid
+  title      String
+  url        String
+  file_id    String?  @db.VarChar
+  is_primary Boolean? @default(false)
+  jerseys    jerseys  @relation(fields: [id_jersey], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.

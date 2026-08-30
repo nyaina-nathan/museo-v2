@@ -136,6 +136,7 @@ type JerseyImageRow = {
   title: string;
   url: string;
   file_id: string | null;
+  is_primary: boolean | null;
 };
 
 function serializeJerseyImage(row: JerseyImageRow): JerseyImage {
@@ -145,6 +146,7 @@ function serializeJerseyImage(row: JerseyImageRow): JerseyImage {
     title: row.title,
     url: row.url,
     file_id: row.file_id,
+    is_primary: row.is_primary ?? false,
   };
 }
 
@@ -186,12 +188,20 @@ export async function createJerseyImage(
 ): Promise<JerseyImage> {
   await assertJerseyExists(jerseyId);
 
+  if (input.is_primary === true) {
+    await prisma.jersey_images.updateMany({
+      where: { id_jersey: jerseyId },
+      data: { is_primary: false },
+    });
+  }
+
   const row = await prisma.jersey_images.create({
     data: {
       id_jersey: jerseyId,
       title: input.title ?? defaultImageTitle(input.url),
       url: input.url,
       file_id: input.file_id ?? null,
+      is_primary: input.is_primary ?? false,
     },
   });
 
@@ -241,6 +251,37 @@ export async function updateJerseyImage(
   const updated = await prisma.jersey_images.update({
     where: { id: imageId },
     data: { title: input.title },
+  });
+
+  return serializeJerseyImage(updated);
+}
+
+export async function setPrimaryJerseyImage(
+  jerseyId: string,
+  imageId: string
+): Promise<JerseyImage> {
+  await assertJerseyExists(jerseyId);
+
+  const row = await prisma.jersey_images.findFirst({
+    where: { id: imageId, id_jersey: jerseyId },
+  });
+
+  if (!row) {
+    throw new ApiError({
+      title: "Not Found",
+      message: "Jersey image not found",
+      status: 404,
+    });
+  }
+
+  await prisma.jersey_images.updateMany({
+    where: { id_jersey: jerseyId },
+    data: { is_primary: false },
+  });
+
+  const updated = await prisma.jersey_images.update({
+    where: { id: imageId },
+    data: { is_primary: true },
   });
 
   return serializeJerseyImage(updated);

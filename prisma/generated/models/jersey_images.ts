@@ -30,6 +30,7 @@ export type Jersey_imagesMinAggregateOutputType = {
   title: string | null
   url: string | null
   file_id: string | null
+  is_primary: boolean | null
 }
 
 export type Jersey_imagesMaxAggregateOutputType = {
@@ -38,6 +39,7 @@ export type Jersey_imagesMaxAggregateOutputType = {
   title: string | null
   url: string | null
   file_id: string | null
+  is_primary: boolean | null
 }
 
 export type Jersey_imagesCountAggregateOutputType = {
@@ -46,6 +48,7 @@ export type Jersey_imagesCountAggregateOutputType = {
   title: number
   url: number
   file_id: number
+  is_primary: number
   _all: number
 }
 
@@ -56,6 +59,7 @@ export type Jersey_imagesMinAggregateInputType = {
   title?: true
   url?: true
   file_id?: true
+  is_primary?: true
 }
 
 export type Jersey_imagesMaxAggregateInputType = {
@@ -64,6 +68,7 @@ export type Jersey_imagesMaxAggregateInputType = {
   title?: true
   url?: true
   file_id?: true
+  is_primary?: true
 }
 
 export type Jersey_imagesCountAggregateInputType = {
@@ -72,6 +77,7 @@ export type Jersey_imagesCountAggregateInputType = {
   title?: true
   url?: true
   file_id?: true
+  is_primary?: true
   _all?: true
 }
 
@@ -153,6 +159,7 @@ export type Jersey_imagesGroupByOutputType = {
   title: string
   url: string
   file_id: string | null
+  is_primary: boolean | null
   _count: Jersey_imagesCountAggregateOutputType | null
   _min: Jersey_imagesMinAggregateOutputType | null
   _max: Jersey_imagesMaxAggregateOutputType | null
@@ -182,6 +189,7 @@ export type jersey_imagesWhereInput = {
   title?: Prisma.StringFilter<"jersey_images"> | string
   url?: Prisma.StringFilter<"jersey_images"> | string
   file_id?: Prisma.StringNullableFilter<"jersey_images"> | string | null
+  is_primary?: Prisma.BoolNullableFilter<"jersey_images"> | boolean | null
   jerseys?: Prisma.XOR<Prisma.JerseysScalarRelationFilter, Prisma.jerseysWhereInput>
 }
 
@@ -191,6 +199,7 @@ export type jersey_imagesOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   url?: Prisma.SortOrder
   file_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_primary?: Prisma.SortOrderInput | Prisma.SortOrder
   jerseys?: Prisma.jerseysOrderByWithRelationInput
 }
 
@@ -203,6 +212,7 @@ export type jersey_imagesWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"jersey_images"> | string
   url?: Prisma.StringFilter<"jersey_images"> | string
   file_id?: Prisma.StringNullableFilter<"jersey_images"> | string | null
+  is_primary?: Prisma.BoolNullableFilter<"jersey_images"> | boolean | null
   jerseys?: Prisma.XOR<Prisma.JerseysScalarRelationFilter, Prisma.jerseysWhereInput>
 }, "id">
 
@@ -212,6 +222,7 @@ export type jersey_imagesOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   url?: Prisma.SortOrder
   file_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_primary?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.jersey_imagesCountOrderByAggregateInput
   _max?: Prisma.jersey_imagesMaxOrderByAggregateInput
   _min?: Prisma.jersey_imagesMinOrderByAggregateInput
@@ -226,6 +237,7 @@ export type jersey_imagesScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"jersey_images"> | string
   url?: Prisma.StringWithAggregatesFilter<"jersey_images"> | string
   file_id?: Prisma.StringNullableWithAggregatesFilter<"jersey_images"> | string | null
+  is_primary?: Prisma.BoolNullableWithAggregatesFilter<"jersey_images"> | boolean | null
 }
 
 export type jersey_imagesCreateInput = {
@@ -233,6 +245,7 @@ export type jersey_imagesCreateInput = {
   title: string
   url: string
   file_id?: string | null
+  is_primary?: boolean | null
   jerseys: Prisma.jerseysCreateNestedOneWithoutJersey_imagesInput
 }
 
@@ -242,6 +255,7 @@ export type jersey_imagesUncheckedCreateInput = {
   title: string
   url: string
   file_id?: string | null
+  is_primary?: boolean | null
 }
 
 export type jersey_imagesUpdateInput = {
@@ -249,6 +263,7 @@ export type jersey_imagesUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   file_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_primary?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   jerseys?: Prisma.jerseysUpdateOneRequiredWithoutJersey_imagesNestedInput
 }
 
@@ -258,6 +273,7 @@ export type jersey_imagesUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   file_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_primary?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type jersey_imagesCreateManyInput = {
@@ -266,6 +282,7 @@ export type jersey_imagesCreateManyInput = {
   title: string
   url: string
   file_id?: string | null
+  is_primary?: boolean | null
 }
 
 export type jersey_imagesUpdateManyMutationInput = {
@@ -273,6 +290,7 @@ export type jersey_imagesUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   file_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_primary?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type jersey_imagesUncheckedUpdateManyInput = {
@@ -281,6 +299,7 @@ export type jersey_imagesUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   file_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_primary?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type jersey_imagesCountOrderByAggregateInput = {
@@ -289,6 +308,7 @@ export type jersey_imagesCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   url?: Prisma.SortOrder
   file_id?: Prisma.SortOrder
+  is_primary?: Prisma.SortOrder
 }
 
 export type jersey_imagesMaxOrderByAggregateInput = {
@@ -297,6 +317,7 @@ export type jersey_imagesMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   url?: Prisma.SortOrder
   file_id?: Prisma.SortOrder
+  is_primary?: Prisma.SortOrder
 }
 
 export type jersey_imagesMinOrderByAggregateInput = {
@@ -305,6 +326,7 @@ export type jersey_imagesMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   url?: Prisma.SortOrder
   file_id?: Prisma.SortOrder
+  is_primary?: Prisma.SortOrder
 }
 
 export type Jersey_imagesListRelationFilter = {
@@ -323,6 +345,10 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
 }
 
 export type jersey_imagesCreateNestedManyWithoutJerseysInput = {
@@ -372,6 +398,7 @@ export type jersey_imagesCreateWithoutJerseysInput = {
   title: string
   url: string
   file_id?: string | null
+  is_primary?: boolean | null
 }
 
 export type jersey_imagesUncheckedCreateWithoutJerseysInput = {
@@ -379,6 +406,7 @@ export type jersey_imagesUncheckedCreateWithoutJerseysInput = {
   title: string
   url: string
   file_id?: string | null
+  is_primary?: boolean | null
 }
 
 export type jersey_imagesCreateOrConnectWithoutJerseysInput = {
@@ -416,6 +444,7 @@ export type jersey_imagesScalarWhereInput = {
   title?: Prisma.StringFilter<"jersey_images"> | string
   url?: Prisma.StringFilter<"jersey_images"> | string
   file_id?: Prisma.StringNullableFilter<"jersey_images"> | string | null
+  is_primary?: Prisma.BoolNullableFilter<"jersey_images"> | boolean | null
 }
 
 export type jersey_imagesCreateManyJerseysInput = {
@@ -423,6 +452,7 @@ export type jersey_imagesCreateManyJerseysInput = {
   title: string
   url: string
   file_id?: string | null
+  is_primary?: boolean | null
 }
 
 export type jersey_imagesUpdateWithoutJerseysInput = {
@@ -430,6 +460,7 @@ export type jersey_imagesUpdateWithoutJerseysInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   file_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_primary?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type jersey_imagesUncheckedUpdateWithoutJerseysInput = {
@@ -437,6 +468,7 @@ export type jersey_imagesUncheckedUpdateWithoutJerseysInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   file_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_primary?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type jersey_imagesUncheckedUpdateManyWithoutJerseysInput = {
@@ -444,6 +476,7 @@ export type jersey_imagesUncheckedUpdateManyWithoutJerseysInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   url?: Prisma.StringFieldUpdateOperationsInput | string
   file_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_primary?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 
@@ -454,6 +487,7 @@ export type jersey_imagesSelect<ExtArgs extends runtime.Types.Extensions.Interna
   title?: boolean
   url?: boolean
   file_id?: boolean
+  is_primary?: boolean
   jerseys?: boolean | Prisma.jerseysDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["jersey_images"]>
 
@@ -463,6 +497,7 @@ export type jersey_imagesSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   title?: boolean
   url?: boolean
   file_id?: boolean
+  is_primary?: boolean
   jerseys?: boolean | Prisma.jerseysDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["jersey_images"]>
 
@@ -472,6 +507,7 @@ export type jersey_imagesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   title?: boolean
   url?: boolean
   file_id?: boolean
+  is_primary?: boolean
   jerseys?: boolean | Prisma.jerseysDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["jersey_images"]>
 
@@ -481,9 +517,10 @@ export type jersey_imagesSelectScalar = {
   title?: boolean
   url?: boolean
   file_id?: boolean
+  is_primary?: boolean
 }
 
-export type jersey_imagesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "id_jersey" | "title" | "url" | "file_id", ExtArgs["result"]["jersey_images"]>
+export type jersey_imagesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "id_jersey" | "title" | "url" | "file_id" | "is_primary", ExtArgs["result"]["jersey_images"]>
 export type jersey_imagesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jerseys?: boolean | Prisma.jerseysDefaultArgs<ExtArgs>
 }
@@ -505,6 +542,7 @@ export type $jersey_imagesPayload<ExtArgs extends runtime.Types.Extensions.Inter
     title: string
     url: string
     file_id: string | null
+    is_primary: boolean | null
   }, ExtArgs["result"]["jersey_images"]>
   composites: {}
 }
@@ -934,6 +972,7 @@ export interface jersey_imagesFieldRefs {
   readonly title: Prisma.FieldRef<"jersey_images", 'String'>
   readonly url: Prisma.FieldRef<"jersey_images", 'String'>
   readonly file_id: Prisma.FieldRef<"jersey_images", 'String'>
+  readonly is_primary: Prisma.FieldRef<"jersey_images", 'Boolean'>
 }
     
 

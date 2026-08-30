@@ -242,6 +242,10 @@ export async function validateCreateJerseyImageInput(
     input.file_id = validateFileId(body.file_id);
   }
 
+  if (typeof body.is_primary === "boolean") {
+    input.is_primary = body.is_primary;
+  }
+
   return input;
 }
 

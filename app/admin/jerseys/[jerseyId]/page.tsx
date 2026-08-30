@@ -35,6 +35,7 @@ export default function JerseyDetailPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadTitle, setUploadTitle] = useState("");
+  const [uploadIsPrimary, setUploadIsPrimary] = useState(false);
   const [previewImage, setPreviewImage] = useState<JerseyImage | null>(null);
 
   const loadImages = useCallback(async () => {
@@ -156,6 +157,7 @@ export default function JerseyDetailPage() {
     setSelectedFile(null);
     setPreviewUrl(null);
     setUploadTitle("");
+    setUploadIsPrimary(false);
     setUploadError(null);
     setShowUploadModal(true);
   }
@@ -167,6 +169,7 @@ export default function JerseyDetailPage() {
     setSelectedFile(null);
     setPreviewUrl(null);
     setUploadTitle("");
+    setUploadIsPrimary(false);
     setUploadError(null);
     setShowUploadModal(false);
   }
@@ -208,6 +211,7 @@ export default function JerseyDetailPage() {
           url: uploaded.url,
           file_id: uploaded.fileId ?? null,
           ...(uploadTitle.trim() ? { title: uploadTitle.trim() } : {}),
+          is_primary: uploadIsPrimary,
         }),
       });
 
@@ -265,6 +269,24 @@ export default function JerseyDetailPage() {
       }
 
       setEditingImageId(null);
+      await loadImages();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    }
+  }
+
+  async function handleSetPrimary(image: JerseyImage) {
+    try {
+      const response = await fetch(
+        `/api/jerseys/${jerseyId}/images/${image.id}/primary`,
+        { method: "PATCH" }
+      );
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.message ?? "Failed to set primary image");
+      }
+
       await loadImages();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -440,11 +462,27 @@ export default function JerseyDetailPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="truncate text-sm font-medium text-text-dark">
-                      {image.title}
-                    </span>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-medium text-text-dark">
+                        {image.title}
+                      </span>
+                      {image.is_primary && (
+                        <span className="shrink-0 rounded bg-primary px-2 py-0.5 text-xs font-semibold text-white">
+                          Primary
+                        </span>
+                      )}
+                    </div>
                     <div className="flex shrink-0 gap-1">
+                      {!image.is_primary && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleSetPrimary(image)}
+                        >
+                          Set primary
+                        </Button>
+                      )}
                       <Button
                         variant="secondary"
                         size="sm"
@@ -518,6 +556,16 @@ export default function JerseyDetailPage() {
                 placeholder="Optional"
                 className={inputStyles}
               />
+            </label>
+
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={uploadIsPrimary}
+                onChange={(e) => setUploadIsPrimary(e.target.checked)}
+                className="accent-primary"
+              />
+              Set as primary photo
             </label>
 
             {uploadError && (

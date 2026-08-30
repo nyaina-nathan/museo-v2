@@ -278,6 +278,12 @@ paths:
                 file_id:
                   type: string
                   description: ImageKit fileId returned on upload, used for server-side cleanup
+                is_primary:
+                  type: boolean
+                  default: false
+                  description: >-
+                    When true, marks this image as the primary image for the
+                    jersey. Any previously primary image is unset.
       responses:
         '201':
           description: Image registered
@@ -316,6 +322,28 @@ paths:
       responses:
         '204':
           description: Jersey image deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/jerseys/{jerseyId}/images/{imageId}/primary:
+    parameters:
+      - $ref: '#/components/parameters/JerseyId'
+      - $ref: '#/components/parameters/ImageId'
+    patch:
+      operationId: setPrimaryJerseyImage
+      tags:
+        - Jersey Images
+      summary: Mark an image as the primary image for its jersey
+      description: >-
+        Sets the given image as the primary image for the jersey. Only one
+        image can be primary at a time; any previously primary image is unset.
+      responses:
+        '200':
+          description: Updated jersey image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JerseyImage'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -541,6 +569,7 @@ components:
         - id_jersey
         - title
         - url
+        - is_primary
       properties:
         id:
           type: string
@@ -558,6 +587,9 @@ components:
           type: string
           nullable: true
           description: ImageKit fileId used for server-side cleanup
+        is_primary:
+          type: boolean
+          description: Whether this image is the primary image for the jersey
 
 tags:
   - name: Auth
