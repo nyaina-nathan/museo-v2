@@ -1,7 +1,5 @@
-import ImageUpload from "@/components/ImageUpload";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <ImageUpload />
-  );
+  redirect("/home");
 }
