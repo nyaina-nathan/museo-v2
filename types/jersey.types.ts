@@ -37,3 +37,17 @@ export interface PaginatedJerseys {
   limit: number;
   total: number;
 }
+
+export interface JerseyImage {
+  id: string;
+  id_jersey: string;
+  title: string;
+  url: string;
+  file_id: string | null;
+}
+
+export interface JerseyImageInput {
+  title?: string;
+  url: string;
+  file_id?: string | null;
+}

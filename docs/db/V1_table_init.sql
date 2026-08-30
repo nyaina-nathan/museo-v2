@@ -22,5 +22,6 @@ create table if not exists jersey_images(
     id uuid primary key default gen_random_uuid(),
     id_jersey uuid not null references jerseys(id) on delete cascade,
     title text not null,
-    url text not null
+    url text not null,
+    file_id varchar
 );

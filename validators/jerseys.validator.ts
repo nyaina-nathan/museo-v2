@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { ApiError } from "@/libs/api-error";
 import type {
+  JerseyImageInput,
   JerseyInput,
   JerseyPatchInput,
   ListJerseysQuery,
@@ -153,6 +154,95 @@ export async function validatePatchJerseyInput(req: NextRequest): Promise<Jersey
   }
 
   return patch;
+}
+
+function validateUrl(value: unknown): string {
+  if (typeof value !== "string" || value.length < 1 || value.length > 2048) {
+    throw new ApiError({
+      title: "Validation Error",
+      message: "Invalid 'url' field",
+      status: 422,
+      details: { url: "must be a non-empty string of at most 2048 characters" },
+    });
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new ApiError({
+      title: "Validation Error",
+      message: "Invalid 'url' field",
+      status: 422,
+      details: { url: "must be a valid URL" },
+    });
+  }
+
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new ApiError({
+      title: "Validation Error",
+      message: "Invalid 'url' field",
+      status: 422,
+      details: { url: "must use the http or https protocol" },
+    });
+  }
+
+  return value;
+}
+
+function validateImageTitle(value: unknown): string {
+  if (typeof value !== "string" || value.length < 1 || value.length > 255) {
+    throw new ApiError({
+      title: "Validation Error",
+      message: "Invalid 'title' field",
+      status: 422,
+      details: { title: "must be a string of at most 255 characters" },
+    });
+  }
+
+  return value;
+}
+
+function validateFileId(value: unknown): string {
+  if (typeof value !== "string" || value.length < 1) {
+    throw new ApiError({
+      title: "Validation Error",
+      message: "Invalid 'file_id' field",
+      status: 422,
+      details: { file_id: "must be a non-empty string" },
+    });
+  }
+
+  return value;
+}
+
+export async function validateCreateJerseyImageInput(
+  req: NextRequest
+): Promise<JerseyImageInput> {
+  const body = assertRecord(await parseJsonBody(req));
+
+  if (body.url === undefined) {
+    throw new ApiError({
+      title: "Validation Error",
+      message: "Missing required field: 'url'",
+      status: 422,
+      details: { url: "required" },
+    });
+  }
+
+  const input: JerseyImageInput = {
+    url: validateUrl(body.url),
+  };
+
+  if (body.title !== undefined) {
+    input.title = validateImageTitle(body.title);
+  }
+
+  if (body.file_id !== undefined && body.file_id !== null) {
+    input.file_id = validateFileId(body.file_id);
+  }
+
+  return input;
 }
 
 function parsePositiveInt(value: string, name: string): number {

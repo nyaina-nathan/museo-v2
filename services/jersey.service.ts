@@ -2,11 +2,14 @@ import { prisma } from "@/libs/prisma";
 import { ApiError } from "@/libs/api-error";
 import type {
   Jersey,
+  JerseyImage,
+  JerseyImageInput,
   JerseyInput,
   JerseyPatchInput,
   ListJerseysQuery,
   PaginatedJerseys,
 } from "@/types/jersey.types";
+import { deleteImageKitFile } from "@/libs/imagekit";
 
 type JerseyRow = {
   id: string;
@@ -125,4 +128,122 @@ export async function deleteJersey(id: string): Promise<void> {
   }
 
   await prisma.jerseys.delete({ where: { id } });
+}
+
+type JerseyImageRow = {
+  id: string;
+  id_jersey: string;
+  title: string;
+  url: string;
+  file_id: string | null;
+};
+
+function serializeJerseyImage(row: JerseyImageRow): JerseyImage {
+  return {
+    id: row.id,
+    id_jersey: row.id_jersey,
+    title: row.title,
+    url: row.url,
+    file_id: row.file_id,
+  };
+}
+
+async function assertJerseyExists(id: string): Promise<void> {
+  const existing = await prisma.jerseys.findUnique({ where: { id } });
+
+  if (!existing) {
+    throw new ApiError({
+      title: "Not Found",
+      message: "Jersey not found",
+      status: 404,
+    });
+  }
+}
+
+function defaultImageTitle(url: string): string {
+  try {
+    return (
+      new URL(url).pathname.split("/").filter(Boolean).pop()?.trim() ?? ""
+    );
+  } catch {
+    return "";
+  }
+}
+
+export async function listJerseyImages(jerseyId: string): Promise<JerseyImage[]> {
+  await assertJerseyExists(jerseyId);
+
+  const rows = await prisma.jersey_images.findMany({
+    where: { id_jersey: jerseyId },
+  });
+
+  return rows.map(serializeJerseyImage);
+}
+
+export async function createJerseyImage(
+  jerseyId: string,
+  input: JerseyImageInput
+): Promise<JerseyImage> {
+  await assertJerseyExists(jerseyId);
+
+  const row = await prisma.jersey_images.create({
+    data: {
+      id_jersey: jerseyId,
+      title: input.title ?? defaultImageTitle(input.url),
+      url: input.url,
+      file_id: input.file_id ?? null,
+    },
+  });
+
+  return serializeJerseyImage(row);
+}
+
+export async function getJerseyImage(
+  jerseyId: string,
+  imageId: string
+): Promise<JerseyImage> {
+  await assertJerseyExists(jerseyId);
+
+  const row = await prisma.jersey_images.findFirst({
+    where: { id: imageId, id_jersey: jerseyId },
+  });
+
+  if (!row) {
+    throw new ApiError({
+      title: "Not Found",
+      message: "Jersey image not found",
+      status: 404,
+    });
+  }
+
+  return serializeJerseyImage(row);
+}
+
+export async function deleteJerseyImage(
+  jerseyId: string,
+  imageId: string
+): Promise<void> {
+  await assertJerseyExists(jerseyId);
+
+  const row = await prisma.jersey_images.findFirst({
+    where: { id: imageId, id_jersey: jerseyId },
+  });
+
+  if (!row) {
+    throw new ApiError({
+      title: "Not Found",
+      message: "Jersey image not found",
+      status: 404,
+    });
+  }
+
+  if (row.file_id) {
+    try {
+      await deleteImageKitFile(row.file_id);
+    } catch (error) {
+      console.error(`ImageKit cleanup failed for file ${row.file_id}:`, error);
+    }
+  }
+
+  await prisma.jersey_images.delete({ where: { id: imageId } });
 }

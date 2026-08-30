@@ -419,10 +419,6 @@ export type jerseysUpdateOneRequiredWithoutJersey_imagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.jerseysUpdateToOneWithWhereWithoutJersey_imagesInput, Prisma.jerseysUpdateWithoutJersey_imagesInput>, Prisma.jerseysUncheckedUpdateWithoutJersey_imagesInput>
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type NullableBoolFieldUpdateOperationsInput = {
   set?: boolean | null
 }

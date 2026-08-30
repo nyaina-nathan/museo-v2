@@ -251,32 +251,36 @@ paths:
       operationId: createJerseyImage
       tags:
         - Jersey Images
-      summary: Upload an image for a jersey
+      summary: Register an image for a jersey
       description: >-
-        The file is stored server-side and its resulting URL is exposed via the
-        `url` field of the returned resource. If `title` is omitted, the file
-        name is used.
+        The image file is uploaded to ImageKit from the client (see
+        `/api/image-kit/auth`). This endpoint persists the resulting URL. If
+        `title` is omitted, it defaults to the last path segment of `url`. The
+        optional `file_id` (returned by ImageKit on upload) allows the server to
+        remove the file from ImageKit when the image is deleted.
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               required:
-                - file
+                - url
               properties:
-                file:
+                url:
                   type: string
-                  contentEncoding: binary
-                  format: binary
-                  description: Image file (image/png, image/jpeg, image/webp, image/gif)
+                  format: uri
+                  description: Publicly accessible image URL returned by ImageKit
                 title:
                   type: string
                   maxLength: 255
-                  description: Optional display title, defaults to the file name
+                  description: Optional display title, defaults to the last path segment of the URL
+                file_id:
+                  type: string
+                  description: ImageKit fileId returned on upload, used for server-side cleanup
       responses:
         '201':
-          description: Image uploaded
+          description: Image registered
           content:
             application/json:
               schema:
@@ -285,12 +289,6 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
-        '413':
-          description: File too large
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
 
   /api/jerseys/{jerseyId}/images/{imageId}:
     parameters:
@@ -555,8 +553,11 @@ components:
         url:
           type: string
           format: uri
-          readOnly: true
-          description: Assigned by the server after storing the uploaded file
+          description: Assigned by the client after uploading to ImageKit
+        file_id:
+          type: string
+          nullable: true
+          description: ImageKit fileId used for server-side cleanup
 
 tags:
   - name: Auth

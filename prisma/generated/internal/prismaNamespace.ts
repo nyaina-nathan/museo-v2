@@ -684,7 +684,8 @@ export const Jersey_imagesScalarFieldEnum = {
   id: 'id',
   id_jersey: 'id_jersey',
   title: 'title',
-  url: 'url'
+  url: 'url',
+  file_id: 'file_id'
 } as const
 
 export type Jersey_imagesScalarFieldEnum = (typeof Jersey_imagesScalarFieldEnum)[keyof typeof Jersey_imagesScalarFieldEnum]
