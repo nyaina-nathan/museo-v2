@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { JerseyCard } from "@/components/client/JerseyCard";
 import { Button } from "@/components/ui/Button";
 import type { Jersey } from "@/types/jersey.types";
 
@@ -70,37 +72,20 @@ export function JerseySelection() {
         {!loading && !error && jerseys.length > 0 && (
           <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {jerseys.map((jersey) => (
-              <li key={jersey.id} className="stamp-border my-2 bg-white p-3">
-                <div className="mb-3 flex aspect-square w-full items-center justify-center rounded bg-primary/5">
-                  <span className="font-display text-5xl font-bold text-primary/20">
-                    {jersey.name.charAt(0)}
-                  </span>
-                </div>
-
-                <h3 className="truncate font-medium text-text-dark">
-                  {jersey.name}
-                </h3>
-
-                <p className="mt-1 line-clamp-2 text-sm text-text-light">
-                  {jersey.description ?? "Awaiting its story."}
-                </p>
-
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-sm font-medium text-primary">
-                    {jersey.price !== null ? `$${jersey.price}` : "P.O.A."}
-                  </span>
-                  <Button size="sm" variant="secondary">
-                    Explore
-                  </Button>
-                </div>
-              </li>
+              <JerseyCard
+                key={jersey.id}
+                jersey={jersey}
+                href={`/collection/${jersey.id}`}
+              />
             ))}
           </ul>
         )}
 
         {!loading && !error && jerseys.length > 0 && (
           <div className="mt-12 text-center">
-            <Button variant="secondary">View the full archive</Button>
+            <Link href="/collection">
+              <Button variant="secondary">View the full archive</Button>
+            </Link>
           </div>
         )}
       </div>
