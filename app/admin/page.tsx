@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/Button";
 import type { Jersey } from "@/types/jersey.types";
 
 interface FilterState {
@@ -46,6 +47,8 @@ const DEFAULT_FILTERS: FilterState = {
   priceMax: "",
   isPublicFilter: "",
 };
+
+const inputStyles = "rounded border border-border px-3 py-2 focus:border-primary";
 
 export default function AdminPage() {
   const [jerseys, setJerseys] = useState<Jersey[]>([]);
@@ -160,57 +163,62 @@ export default function AdminPage() {
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
-    <div className="mx-auto w-full max-w-2xl p-6">
-      <h1 className="mb-6 text-2xl font-semibold">Admin</h1>
-
-      <div className="mb-8 flex items-center justify-between">
-        <h2 className="text-lg font-medium">Jerseys</h2>
+    <div className="mx-auto w-full p-6">
+      <header className="mb-10 flex items-end justify-between border-b border-border pb-4">
+        <div>
+          <Link
+            href="/admin"
+            className="font-display text-3xl font-bold tracking-wide text-primary"
+          >
+            MUSEO
+          </Link>
+          <p className="mt-1 text-sm text-text-light">Administration</p>
+        </div>
 
         {!showCreate && (
-          <button
-            onClick={() => setShowCreate(true)}
-            className="rounded bg-black px-4 py-2 text-white"
-          >
-            Create jersey
-          </button>
+          <Button size="sm" onClick={() => setShowCreate(true)}>
+            Create a piece
+          </Button>
         )}
-      </div>
+      </header>
 
       {showCreate && (
         <form
           onSubmit={handleCreate}
-          className="mb-8 flex flex-col gap-3 rounded-lg border border-gray-200 p-4"
+          className="mb-10 flex flex-col gap-3 rounded-lg border border-border bg-white p-6"
         >
-          <h2 className="text-lg font-medium">Create jersey</h2>
+          <h2 className="font-display text-xl font-bold text-primary">
+            Record a new piece
+          </h2>
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm">Name</span>
+            <span className="text-sm font-medium">Name</span>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="rounded border border-gray-300 px-3 py-2"
+              className={inputStyles}
             />
           </label>
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm">Description</span>
+            <span className="text-sm font-medium">Description</span>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="rounded border border-gray-300 px-3 py-2"
+              className={inputStyles}
             />
           </label>
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm">Price</span>
+            <span className="text-sm font-medium">Price</span>
             <input
               type="number"
               min={1}
               step={1}
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="rounded border border-gray-300 px-3 py-2"
+              className={inputStyles}
             />
           </label>
 
@@ -219,49 +227,42 @@ export default function AdminPage() {
               type="checkbox"
               checked={isPublic}
               onChange={(e) => setIsPublic(e.target.checked)}
+              className="accent-primary"
             />
             Public
           </label>
 
-          {saveError && <p className="text-sm text-red-600">{saveError}</p>}
+          {saveError && <p className="text-sm text-primary-dark">{saveError}</p>}
 
           <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-            >
-              {saving ? "Creating..." : "Create"}
-            </button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Recording..." : "Record piece"}
+            </Button>
 
-            <button
-              type="button"
-              onClick={() => setShowCreate(false)}
-              className="rounded border border-gray-300 px-4 py-2"
-            >
+            <Button variant="secondary" onClick={() => setShowCreate(false)}>
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       )}
 
       <form
         onSubmit={applyFilters}
-        className="mb-4 grid grid-cols-2 gap-3 rounded-lg border border-gray-200 p-4"
+        className="mb-6 flex flex-wrap items-end gap-3 rounded-lg border border-border bg-white p-4 lg:flex-nowrap"
       >
         <label className="flex flex-col gap-1">
-          <span className="text-sm">Name</span>
+          <span className="text-sm font-medium">Name</span>
           <input
             value={filters.search}
             onChange={(e) =>
               setFilters({ ...filters, search: e.target.value })
             }
-            className="rounded border border-gray-300 px-3 py-2"
+            className={inputStyles}
           />
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm">Visibility</span>
+          <span className="text-sm font-medium">Visibility</span>
           <select
             value={filters.isPublicFilter}
             onChange={(e) =>
@@ -270,7 +271,7 @@ export default function AdminPage() {
                 isPublicFilter: e.target.value as FilterState["isPublicFilter"],
               })
             }
-            className="rounded border border-gray-300 px-3 py-2"
+            className={inputStyles}
           >
             <option value="">All</option>
             <option value="true">Public</option>
@@ -279,7 +280,7 @@ export default function AdminPage() {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm">Min price</span>
+          <span className="text-sm font-medium">Min price</span>
           <input
             type="number"
             min={1}
@@ -288,12 +289,12 @@ export default function AdminPage() {
             onChange={(e) =>
               setFilters({ ...filters, priceMin: e.target.value })
             }
-            className="rounded border border-gray-300 px-3 py-2"
+            className={inputStyles}
           />
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm">Max price</span>
+          <span className="text-sm font-medium">Max price</span>
           <input
             type="number"
             min={1}
@@ -302,64 +303,65 @@ export default function AdminPage() {
             onChange={(e) =>
               setFilters({ ...filters, priceMax: e.target.value })
             }
-            className="rounded border border-gray-300 px-3 py-2"
+            className={inputStyles}
           />
         </label>
 
-        <div className="col-span-2 flex items-end justify-between gap-3">
-          <label className="flex flex-col gap-1">
-            <span className="text-sm">Per page</span>
-            <select
-              value={limit}
-              onChange={(e) => handleLimitChange(Number(e.target.value))}
-              className="rounded border border-gray-300 px-3 py-2"
-            >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-          </label>
+        <label className="flex flex-col gap-1">
+          <span className="text-sm font-medium">Per page</span>
+          <select
+            value={limit}
+            onChange={(e) => handleLimitChange(Number(e.target.value))}
+            className={inputStyles}
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
+        </label>
 
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="rounded bg-black px-4 py-2 text-white"
-            >
-              Apply
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setFilters(DEFAULT_FILTERS);
-                setPage(1);
-                setQueryString(buildQueryString(DEFAULT_FILTERS, 1, limit));
-              }}
-              className="rounded border border-gray-300 px-4 py-2"
-            >
-              Reset
-            </button>
-          </div>
+        <div className="flex gap-2">
+          <Button type="submit" size="sm">
+            Apply
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              setFilters(DEFAULT_FILTERS);
+              setPage(1);
+              setQueryString(buildQueryString(DEFAULT_FILTERS, 1, limit));
+            }}
+          >
+            Reset
+          </Button>
         </div>
       </form>
 
-      {loading && <p>Loading...</p>}
+      <h2 className="mb-4 font-display text-2xl font-bold text-primary">
+        Pieces
+      </h2>
 
-      {error && <p className="text-red-600">{error}</p>}
+      {loading && <p className="text-text-light">Loading...</p>}
+
+      {error && <p className="text-primary-dark">{error}</p>}
 
       {!loading && !error && jerseys.length === 0 && (
-        <p className="text-gray-500">No jerseys found.</p>
+        <p className="text-text-light">
+          Your collection awaits its first artifact.
+        </p>
       )}
 
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-3">
         {jerseys.map((jersey) => (
           <li key={jersey.id}>
             <Link
               href={`/admin/jerseys/${jersey.id}`}
-              className="flex items-center justify-between rounded border border-gray-200 px-4 py-3 hover:bg-gray-50"
+              className="flex items-center justify-between rounded-lg border border-border border-l-4 border-l-primary bg-white px-4 py-3 transition-colors hover:bg-primary/5"
             >
-              <span className="font-medium">{jersey.name}</span>
-              <span className="text-sm text-gray-500">
+              <span className="font-medium text-text-dark">{jersey.name}</span>
+              <span className="text-sm text-text-light">
                 {jersey.is_public ? "Public" : "Private"}
                 {jersey.price !== null ? ` · $${jersey.price}` : ""}
               </span>
@@ -369,26 +371,28 @@ export default function AdminPage() {
       </ul>
 
       {!loading && total > 0 && (
-        <div className="mt-4 flex items-center justify-between">
-          <button
+        <div className="mt-6 flex items-center justify-between">
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => goToPage(page - 1)}
             disabled={page <= 1}
-            className="rounded border border-gray-300 px-4 py-2 disabled:opacity-50"
           >
             Previous
-          </button>
+          </Button>
 
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-text-light">
             Page {page} of {totalPages} ({total} total)
           </span>
 
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={() => goToPage(page + 1)}
             disabled={page >= totalPages}
-            className="rounded border border-gray-300 px-4 py-2 disabled:opacity-50"
           >
             Next
-          </button>
+          </Button>
         </div>
       )}
     </div>

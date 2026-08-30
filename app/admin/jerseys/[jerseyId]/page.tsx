@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/Button";
 import { useImageKitUpload } from "@/hooks/useImageKitUpload";
 import type { Jersey, JerseyImage } from "@/types/jersey.types";
+
+const inputStyles = "rounded border border-border px-3 py-2 focus:border-primary";
 
 export default function JerseyDetailPage() {
   const { jerseyId } = useParams<{ jerseyId: string }>();
@@ -234,7 +237,7 @@ export default function JerseyDetailPage() {
   if (loading) {
     return (
       <div className="mx-auto w-full max-w-2xl p-6">
-        <p>Loading...</p>
+        <p className="text-text-light">Loading...</p>
       </div>
     );
   }
@@ -242,56 +245,77 @@ export default function JerseyDetailPage() {
   if (error && !jersey) {
     return (
       <div className="mx-auto w-full max-w-2xl p-6">
-        <p className="text-red-600">{error}</p>
-        <Link href="/admin" className="mt-4 inline-block text-sm underline">
-          Back to admin
-        </Link>
+        <p className="text-primary-dark">{error}</p>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push("/admin")}
+          className="mt-4"
+        >
+          Back to archive
+        </Button>
       </div>
     );
   }
 
   return (
     <div className="mx-auto w-full max-w-2xl p-6">
-      <Link href="/admin" className="mb-4 inline-block text-sm underline">
-        Back to admin
-      </Link>
+      <header className="mb-10 flex items-end justify-between border-b border-border pb-4">
+        <div>
+          <Link
+            href="/admin"
+            className="font-display text-3xl font-bold tracking-wide text-primary"
+          >
+            MUSEO
+          </Link>
+          <p className="mt-1 text-sm text-text-light">Administration</p>
+        </div>
 
-      <h1 className="mb-6 text-2xl font-semibold">{jersey?.name}</h1>
+        <Button variant="ghost" size="sm" onClick={() => router.push("/admin")}>
+          Back to archive
+        </Button>
+      </header>
+
+      <h1 className="mb-8 font-display text-3xl font-bold text-primary">
+        {jersey?.name}
+      </h1>
 
       <form
         onSubmit={handleUpdate}
-        className="mb-8 flex flex-col gap-3 rounded-lg border border-gray-200 p-4"
+        className="mb-10 flex flex-col gap-3 rounded-lg border border-border bg-white p-6"
       >
-        <h2 className="text-lg font-medium">Edit jersey</h2>
+        <h2 className="font-display text-xl font-bold text-primary">
+          Curate this piece
+        </h2>
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm">Name</span>
+          <span className="text-sm font-medium">Name</span>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="rounded border border-gray-300 px-3 py-2"
+            className={inputStyles}
           />
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm">Description</span>
+          <span className="text-sm font-medium">Description</span>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="rounded border border-gray-300 px-3 py-2"
+            className={inputStyles}
           />
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm">Price</span>
+          <span className="text-sm font-medium">Price</span>
           <input
             type="number"
             min={1}
             step={1}
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            className="rounded border border-gray-300 px-3 py-2"
+            className={inputStyles}
           />
         </label>
 
@@ -300,56 +324,53 @@ export default function JerseyDetailPage() {
             type="checkbox"
             checked={isPublic}
             onChange={(e) => setIsPublic(e.target.checked)}
+            className="accent-primary"
           />
           Public
         </label>
 
-        {saveError && <p className="text-sm text-red-600">{saveError}</p>}
+        {saveError && <p className="text-sm text-primary-dark">{saveError}</p>}
 
         <div className="flex gap-2">
-          <button
-            type="submit"
-            disabled={saving}
-            className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-          >
-            {saving ? "Saving..." : "Save"}
-          </button>
+          <Button type="submit" disabled={saving}>
+            {saving ? "Saving..." : "Save changes"}
+          </Button>
 
-          <button
-            type="button"
+          <Button
+            variant="danger"
             onClick={handleDelete}
             disabled={deleting}
-            className="rounded bg-red-600 px-4 py-2 text-white disabled:opacity-50"
           >
-            {deleting ? "Deleting..." : "Delete jersey"}
-          </button>
+            {deleting ? "Deleting..." : "Remove from archive"}
+          </Button>
         </div>
       </form>
 
       <section>
-        <h2 className="mb-4 text-lg font-medium">Images</h2>
+        <h2 className="mb-4 font-display text-2xl font-bold text-primary">
+          Imagery
+        </h2>
 
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
           onChange={handleUpload}
-          className="mb-4"
+          className="mb-4 text-sm text-text-light"
         />
 
-        {uploading && <p>Uploading...</p>}
+        {uploading && <p className="text-text-light">Uploading...</p>}
 
-        {uploadError && <p className="text-sm text-red-600">{uploadError}</p>}
+        {uploadError && <p className="text-sm text-primary-dark">{uploadError}</p>}
 
         {images.length === 0 ? (
-          <p className="text-gray-500">No images yet.</p>
+          <p className="text-text-light">
+            This piece awaits its visual testimony.
+          </p>
         ) : (
-          <ul className="grid grid-cols-2 gap-4">
+          <ul className="grid grid-cols-2 gap-6">
             {images.map((image) => (
-              <li
-                key={image.id}
-                className="rounded border border-gray-200 p-3"
-              >
+              <li key={image.id} className="stamp-border my-2 bg-white p-3">
                 <img
                   src={image.url}
                   alt={image.title}
@@ -362,39 +383,44 @@ export default function JerseyDetailPage() {
                     <input
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      className="rounded border border-gray-300 px-2 py-1 text-sm"
+                      className={`${inputStyles} px-2 py-1 text-sm`}
                     />
                     <div className="flex gap-1">
-                      <button
+                      <Button
+                        size="sm"
                         onClick={() => handleSaveTitle(image)}
-                        className="rounded bg-black px-2 py-1 text-xs text-white"
                       >
                         Save
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={() => setEditingImageId(null)}
-                        className="rounded border border-gray-300 px-2 py-1 text-xs"
                       >
                         Cancel
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-center justify-between gap-2">
-                    <span className="truncate text-sm">{image.title}</span>
+                    <span className="truncate text-sm font-medium text-text-dark">
+                      {image.title}
+                    </span>
                     <div className="flex shrink-0 gap-1">
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={() => startEditTitle(image)}
-                        className="rounded border border-gray-300 px-2 py-1 text-xs"
                       >
                         Edit
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
                         onClick={() => handleDeleteImage(image)}
-                        className="rounded bg-red-600 px-2 py-1 text-xs text-white"
                       >
                         Delete
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}
