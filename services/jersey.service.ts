@@ -219,6 +219,33 @@ export async function getJerseyImage(
   return serializeJerseyImage(row);
 }
 
+export async function updateJerseyImage(
+  jerseyId: string,
+  imageId: string,
+  input: { title: string }
+): Promise<JerseyImage> {
+  await assertJerseyExists(jerseyId);
+
+  const row = await prisma.jersey_images.findFirst({
+    where: { id: imageId, id_jersey: jerseyId },
+  });
+
+  if (!row) {
+    throw new ApiError({
+      title: "Not Found",
+      message: "Jersey image not found",
+      status: 404,
+    });
+  }
+
+  const updated = await prisma.jersey_images.update({
+    where: { id: imageId },
+    data: { title: input.title },
+  });
+
+  return serializeJerseyImage(updated);
+}
+
 export async function deleteJerseyImage(
   jerseyId: string,
   imageId: string

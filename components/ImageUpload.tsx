@@ -1,10 +1,10 @@
 "use client";
 
-import { upload } from "@imagekit/next";
+import { useImageKitUpload } from "@/hooks/useImageKitUpload";
 import { useState } from "react";
 
 export default function ImageUpload() {
-  const [uploading, setUploading] = useState(false);
+  const { uploading, error, uploadFile } = useImageKitUpload();
   const [imageUrl, setImageUrl] = useState("");
 
   async function handleUpload(
@@ -14,38 +14,10 @@ export default function ImageUpload() {
 
     if (!file) return;
 
-    setUploading(true);
+    const uploaded = await uploadFile(file);
 
-    try {
-      const authResponse = await fetch("/api/image-kit/auth");
-
-      if (!authResponse.ok) {
-        throw new Error("Failed to authenticate");
-      }
-
-      const auth = await authResponse.json();
-
-      const result = await upload({
-        file,
-        fileName: file.name,
-
-        publicKey: auth.publicKey,
-        token: auth.token,
-        signature: auth.signature,
-        expire: auth.expire,
-
-        folder: "/products",
-
-        useUniqueFileName: true,
-      });
-
-      console.log(result);
-
-      setImageUrl(result.url as string);
-    } catch (error) {
-      console.error("Upload failed:", error);
-    } finally {
-      setUploading(false);
+    if (uploaded) {
+      setImageUrl(uploaded.url);
     }
   }
 
@@ -58,6 +30,8 @@ export default function ImageUpload() {
       />
 
       {uploading && <p>Uploading...</p>}
+
+      {error && <p>{error}</p>}
 
       {imageUrl && (
         <img

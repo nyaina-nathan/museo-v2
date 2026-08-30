@@ -245,6 +245,25 @@ export async function validateCreateJerseyImageInput(
   return input;
 }
 
+export async function validatePatchJerseyImageInput(
+  req: NextRequest
+): Promise<{ title: string }> {
+  const body = assertRecord(await parseJsonBody(req));
+
+  if (body.title === undefined) {
+    throw new ApiError({
+      title: "Validation Error",
+      message: "Missing required field: 'title'",
+      status: 422,
+      details: { title: "required" },
+    });
+  }
+
+  return {
+    title: validateImageTitle(body.title),
+  };
+}
+
 function parsePositiveInt(value: string, name: string): number {
   if (!/^\d+$/.test(value)) {
     throw new ApiError({
