@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 
 const HERO_IMAGES = [
@@ -9,7 +10,7 @@ const HERO_IMAGES = [
 
 export function Hero() {
   return (
-    <section className="relative bg-primary text-white">
+    <section className="relative -mt-[75px] z-0 bg-primary text-white">
       <div className="grid h-[72vh] min-h-[560px] w-full grid-cols-3 gap-0 md:h-[64vh] md:min-h-0 md:gap-1">
         {HERO_IMAGES.map((image, index) => (
           <div
@@ -33,27 +34,19 @@ export function Hero() {
 
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-5 text-center md:px-10">
         <div className="max-w-3xl">
-          <p className="mb-4 text-sm font-medium uppercase tracking-[0.2em] text-white/70">
-            The ex vintage jersey archive
-          </p>
-
-          <h1 className="font-display text-5xl font-bold leading-tight md:text-6xl">
-            Every jersey carries a story worth preserving.
+          <h1 className="font-display text-4xl font-bold leading-tight text-white md:text-5xl">
+            Have a look at our collection
           </h1>
 
-          <p className="mt-6 text-base leading-relaxed text-white/80 md:text-lg">
-            A curated collection of iconic pieces, each one a testament to
-            heritage and craftsmanship. Explore the archive and uncover the
-            stories woven into every thread.
-          </p>
-
-          <div className="mt-10">
-            <Button
-              variant="secondary"
-              className="border-white bg-transparent text-white hover:bg-white hover:text-primary"
-            >
-              View the archive
-            </Button>
+          <div className="mt-8">
+            <Link href="/collection">
+              <Button
+                variant="secondary"
+                className="border-white bg-transparent text-white hover:bg-primary hover:text-white cursor-pointer"
+              >
+                Discover
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
