@@ -15,15 +15,14 @@ interface HeaderProps {
 }
 
 export function Header({ transparentOnTop = false }: HeaderProps) {
-  const [isScrolled, setIsScrolled] = useState(
-    () => typeof window !== "undefined" && window.scrollY > 0,
-  );
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);
     };
 
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);

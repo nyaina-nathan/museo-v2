@@ -1,41 +1,40 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
 import type { Jersey } from "@/types/jersey.types";
 
 interface JerseyCardProps {
   jersey: Jersey;
   href?: string;
+  liClassName?: string;
 }
 
-export function JerseyCard({ jersey, href }: JerseyCardProps) {
+export function JerseyCard({ jersey, href, liClassName }: JerseyCardProps) {
   const content = (
-    <div className="stamp-border my-2 h-full bg-white p-3">
-      <div className="mb-3 flex aspect-square w-full items-center justify-center rounded bg-primary/5">
-        <span className="font-display text-5xl font-bold text-primary/20">
-          {jersey.name.charAt(0)}
-        </span>
+    <div className="my-2 h-full  border-2 border-primary bg-white p-3">
+      <div className="mb-3 flex aspect-square w-full items-center justify-center overflow-hidden rounded bg-primary/5">
+        {jersey.primary_image_url ? (
+          <img
+            src={jersey.primary_image_url}
+            alt={jersey.name}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <span className="font-display text-5xl font-bold text-primary/20">
+            {jersey.name.charAt(0)}
+          </span>
+        )}
       </div>
 
       <h3 className="truncate font-medium text-text-dark">{jersey.name}</h3>
 
-      <p className="mt-1 line-clamp-2 text-sm text-text-light">
-        {jersey.description ?? "Awaiting its story."}
+      <p className="mt-1 text-sm font-medium text-primary">
+        {jersey.price !== null ? `Ar ${jersey.price}` : "P.O.A."}
       </p>
-
-      <div className="mt-3 flex items-center justify-between">
-        <span className="text-sm font-medium text-primary">
-          {jersey.price !== null ? `$${jersey.price}` : "P.O.A."}
-        </span>
-        <Button size="sm" variant="secondary">
-          Explore
-        </Button>
-      </div>
     </div>
   );
 
   if (href) {
     return (
-      <li className="h-full">
+      <li className={`h-full ${liClassName ?? ""}`}>
         <Link href={href} className="block h-full">
           {content}
         </Link>
@@ -43,5 +42,5 @@ export function JerseyCard({ jersey, href }: JerseyCardProps) {
     );
   }
 
-  return <li className="h-full">{content}</li>;
+  return <li className={`h-full ${liClassName ?? ""}`}>{content}</li>;
 }
