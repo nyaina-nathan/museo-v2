@@ -6,6 +6,11 @@ export interface Jersey {
   price: number | null;
   created_at: string;
   updated_at: string | null;
+  primary_image_url: string | null;
+}
+
+export interface JerseyWithImages extends Jersey {
+  images: JerseyImage[];
 }
 
 export interface JerseyInput {

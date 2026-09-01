@@ -189,7 +189,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Jersey'
+                $ref: '#/components/schemas/JerseyWithImages'
         '404':
           $ref: '#/components/responses/NotFound'
     patch:
@@ -521,6 +521,26 @@ components:
             - string
             - 'null'
           format: date-time
+        primary_image_url:
+          type:
+            - string
+            - 'null'
+          format: uri
+          description: >-
+            URL of the image marked as primary for the jersey, else the URL of
+            the first registered image, else null when the jersey has no images.
+
+    JerseyWithImages:
+      allOf:
+        - $ref: '#/components/schemas/Jersey'
+        - type: object
+          required:
+            - images
+          properties:
+            images:
+              type: array
+              items:
+                $ref: '#/components/schemas/JerseyImage'
 
     JerseyInput:
       type: object

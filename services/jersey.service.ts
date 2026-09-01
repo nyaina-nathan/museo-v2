@@ -6,6 +6,7 @@ import type {
   JerseyImageInput,
   JerseyInput,
   JerseyPatchInput,
+  JerseyWithImages,
   ListJerseysQuery,
   PaginatedJerseys,
 } from "@/types/jersey.types";
@@ -19,9 +20,17 @@ type JerseyRow = {
   price: number | null;
   created_at: Date | null;
   updated_at: Date | null;
+  jersey_images?: Array<{
+    url: string;
+    is_primary: boolean | null;
+  }>;
 };
 
 function serializeJersey(row: JerseyRow): Jersey {
+  const primary =
+    row.jersey_images?.find((image) => image.is_primary) ??
+    row.jersey_images?.[0];
+
   return {
     id: row.id,
     name: row.name,
@@ -30,6 +39,7 @@ function serializeJersey(row: JerseyRow): Jersey {
     price: row.price,
     created_at: row.created_at?.toISOString() ?? new Date().toISOString(),
     updated_at: row.updated_at?.toISOString() ?? null,
+    primary_image_url: primary?.url ?? null,
   };
 }
 
@@ -52,6 +62,7 @@ export async function listJerseys(query: ListJerseysQuery): Promise<PaginatedJer
       where,
       skip: (page - 1) * limit,
       take: limit,
+      include: { jersey_images: true },
     }),
     prisma.jerseys.count({ where }),
   ]);
@@ -64,8 +75,11 @@ export async function listJerseys(query: ListJerseysQuery): Promise<PaginatedJer
   };
 }
 
-export async function getJersey(id: string): Promise<Jersey> {
-  const row = await prisma.jerseys.findUnique({ where: { id } });
+export async function getJersey(id: string): Promise<JerseyWithImages> {
+  const row = await prisma.jerseys.findUnique({
+    where: { id },
+    include: { jersey_images: true },
+  });
 
   if (!row) {
     throw new ApiError({
@@ -75,7 +89,10 @@ export async function getJersey(id: string): Promise<Jersey> {
     });
   }
 
-  return serializeJersey(row);
+  return {
+    ...serializeJersey(row),
+    images: row.jersey_images.map(serializeJerseyImage),
+  };
 }
 
 export async function createJersey(input: JerseyInput): Promise<Jersey> {
