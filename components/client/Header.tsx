@@ -6,10 +6,7 @@ import { Button } from "@/components/ui/Button";
 
 const NAV_LINKS = [
   { label: "Collection", href: "/collection" },
-  { label: "Archive", href: "/archive" },
-  { label: "FAQ", href: "/faq" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+  {label: "Home", href :"/home"}
 ];
 
 interface HeaderProps {
@@ -40,7 +37,7 @@ export function Header({ transparentOnTop = false }: HeaderProps) {
           : "border-b border-border bg-white"
       }`}
     >
-      <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between px-5 py-4 md:px-10 lg:px-[60px]">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-4 md:px-10 lg:px-15">
         <Link
           href="/"
           className={`font-display text-2xl font-bold tracking-wide transition-colors ${

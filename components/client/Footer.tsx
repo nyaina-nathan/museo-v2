@@ -2,8 +2,7 @@ import Link from "next/link";
 import { SocialLinks } from "@/components/client/SocialLinks";
 
 const QUICK_LINKS = [
-  { label: "Collection", href: "/collection" },
-  { label: "Admin", href: "/admin" },
+  { label: "Admin", href: "/login" },
   { label: "FAQ", href: "/faq" },
   { label: "About Us", href: "/about" },
 ];
@@ -11,7 +10,7 @@ const QUICK_LINKS = [
 export function Footer() {
   return (
     <footer className="border-t border-border bg-white">
-      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 gap-10 px-5 py-12 md:grid-cols-3 md:px-10 lg:px-[60px]">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-5 py-12 md:grid-cols-3 md:px-10 lg:px-15">
         <div>
           <Link
             href="/"
