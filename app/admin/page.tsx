@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import type { Jersey } from "@/types/jersey.types";
@@ -57,6 +58,7 @@ const DEFAULT_FILTERS: FilterState = {
 const inputStyles = "rounded border border-border px-3 py-2 focus:border-primary";
 
 export default function AdminPage() {
+  const router = useRouter();
   const [jerseys, setJerseys] = useState<Jersey[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +76,14 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+
+  const [showCreateUser, setShowCreateUser] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [createUserError, setCreateUserError] = useState<string | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -166,6 +176,52 @@ export default function AdminPage() {
     }
   }
 
+  async function handleLogout() {
+    setLoggingOut(true);
+
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } finally {
+      router.push("/home");
+      router.refresh();
+    }
+  }
+
+  async function handleCreateUser(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setCreatingUser(true);
+    setCreateUserError(null);
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: newUsername,
+          email: newEmail,
+          password: newPassword,
+        }),
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.message ?? "Failed to create user");
+      }
+
+      setNewUsername("");
+      setNewEmail("");
+      setNewPassword("");
+      setShowCreateUser(false);
+    } catch (err) {
+      setCreateUserError(
+        err instanceof Error ? err.message : "Something went wrong"
+      );
+    } finally {
+      setCreatingUser(false);
+    }
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
@@ -181,12 +237,99 @@ export default function AdminPage() {
           <p className="mt-1 text-sm text-text-light">Administration</p>
         </div>
 
-        {!showCreate && (
-          <Button size="sm" onClick={() => setShowCreate(true)}>
-            Create a piece
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleLogout}
+            disabled={loggingOut}
+          >
+            {loggingOut ? "Logging out..." : "Logout"}
           </Button>
-        )}
+
+          <Button size="sm" onClick={() => setShowCreateUser(true)}>
+            Create an user
+          </Button>
+
+          {!showCreate && (
+            <Button size="sm" onClick={() => setShowCreate(true)}>
+              Create a piece
+            </Button>
+          )}
+        </div>
       </header>
+
+      {showCreateUser && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setShowCreateUser(false)}
+        >
+          <form
+            onSubmit={handleCreateUser}
+            onClick={(e) => e.stopPropagation()}
+            className="flex w-full max-w-md flex-col gap-3 rounded-lg border border-border bg-white p-6 shadow-lg"
+          >
+            <h2 className="font-display text-xl font-bold text-primary">
+              Create a new user
+            </h2>
+
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium">Username</span>
+              <input
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+                required
+                minLength={1}
+                maxLength={100}
+                className={inputStyles}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium">Email</span>
+              <input
+                type="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                required
+                className={inputStyles}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium">Password</span>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                minLength={8}
+                className={inputStyles}
+              />
+              <span className="text-xs text-text-light">
+                At least 8 characters
+              </span>
+            </label>
+
+            {createUserError && (
+              <p className="text-sm text-primary-dark">{createUserError}</p>
+            )}
+
+            <div className="flex gap-2">
+              <Button type="submit" disabled={creatingUser}>
+                {creatingUser ? "Creating..." : "Create user"}
+              </Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => setShowCreateUser(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {showCreate && (
         <form
