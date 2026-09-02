@@ -92,3 +92,35 @@ export async function getUserById(id: string): Promise<User> {
 
   return serializeUser(row);
 }
+
+export async function listUsers(): Promise<User[]> {
+  const rows = await prisma.users.findMany();
+
+  return rows.map(serializeUser);
+}
+
+export async function deleteUser(id: string): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const existing = await tx.users.findUnique({ where: { id } });
+
+    if (!existing) {
+      throw new ApiError({
+        title: "Not Found",
+        message: "User not found",
+        status: 404,
+      });
+    }
+
+    const total = await tx.users.count();
+
+    if (total <= 1) {
+      throw new ApiError({
+        title: "Conflict",
+        message: "Cannot delete the last remaining user",
+        status: 409,
+      });
+    }
+
+    await tx.users.delete({ where: { id } });
+  });
+}
