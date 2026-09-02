@@ -298,6 +298,8 @@ export function validateListJerseyQuery(req: NextRequest): ListJerseysQuery {
   const query: ListJerseysQuery = {
     page: 1,
     limit: 20,
+    orderBy: "createdAt",
+    order: "desc",
   };
 
   const name = searchParams.get("name");
@@ -313,6 +315,32 @@ export function validateListJerseyQuery(req: NextRequest): ListJerseysQuery {
   const priceMax = searchParams.get("priceMax");
   if (priceMax !== null) {
     query.priceMax = parsePositiveInt(priceMax, "priceMax");
+  }
+
+  const orderBy = searchParams.get("orderBy");
+  if (orderBy !== null) {
+    if (orderBy !== "createdAt" && orderBy !== "name" && orderBy !== "price") {
+      throw new ApiError({
+        title: "Validation Error",
+        message: "Invalid 'orderBy' parameter",
+        status: 422,
+        details: { orderBy: 'must be "createdAt", "name" or "price"' },
+      });
+    }
+    query.orderBy = orderBy;
+  }
+
+  const order = searchParams.get("order");
+  if (order !== null) {
+    if (order !== "asc" && order !== "desc") {
+      throw new ApiError({
+        title: "Validation Error",
+        message: "Invalid 'order' parameter",
+        status: 422,
+        details: { order: 'must be "asc" or "desc"' },
+      });
+    }
+    query.order = order;
   }
 
   const isPublic = searchParams.get("isPublic");

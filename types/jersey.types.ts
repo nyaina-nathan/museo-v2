@@ -32,6 +32,8 @@ export interface ListJerseysQuery {
   priceMin?: number;
   priceMax?: number;
   isPublic?: boolean;
+  orderBy?: "createdAt" | "name" | "price";
+  order?: "asc" | "desc";
   page: number;
   limit: number;
 }

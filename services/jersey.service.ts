@@ -44,7 +44,7 @@ function serializeJersey(row: JerseyRow): Jersey {
 }
 
 export async function listJerseys(query: ListJerseysQuery): Promise<PaginatedJerseys> {
-  const { name, priceMin, priceMax, isPublic, page, limit } = query;
+  const { name, priceMin, priceMax, isPublic, orderBy, order, page, limit } = query;
 
   const price = {
     ...(priceMin !== undefined ? { gte: priceMin } : {}),
@@ -57,11 +57,24 @@ export async function listJerseys(query: ListJerseysQuery): Promise<PaginatedJer
     ...(isPublic !== undefined ? { is_public: isPublic } : {}),
   };
 
+  const prismaOrderBy = (() => {
+    switch (orderBy) {
+      case "name":
+        return { name: order };
+      case "price":
+        return { price: order };
+      case "createdAt":
+      default:
+        return { created_at: order };
+    }
+  })();
+
   const [rows, total] = await Promise.all([
     prisma.jerseys.findMany({
       where,
       skip: (page - 1) * limit,
       take: limit,
+      orderBy: prismaOrderBy,
       include: { jersey_images: true },
     }),
     prisma.jerseys.count({ where }),
