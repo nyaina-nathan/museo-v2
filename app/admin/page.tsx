@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import type { Jersey } from "@/types/jersey.types";
+import type { User } from "@/types/user.types";
 
 interface FilterState {
   search: string;
@@ -84,6 +85,15 @@ export default function AdminPage() {
   const [creatingUser, setCreatingUser] = useState(false);
   const [createUserError, setCreateUserError] = useState<string | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
+
+  const [showUsers, setShowUsers] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersError, setUsersError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [confirmingUserId, setConfirmingUserId] = useState<string | null>(null);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const [deleteUserError, setDeleteUserError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -222,6 +232,74 @@ export default function AdminPage() {
     }
   }
 
+  function closeUsersModal() {
+    setShowUsers(false);
+    setUsersError(null);
+    setDeleteUserError(null);
+    setConfirmingUserId(null);
+  }
+
+  async function openUsersModal() {
+    setShowUsers(true);
+    setUsersLoading(true);
+    setUsersError(null);
+    setDeleteUserError(null);
+    setConfirmingUserId(null);
+
+    try {
+      const [usersRes, meRes] = await Promise.all([
+        fetch("/api/users"),
+        fetch("/api/auth/me"),
+      ]);
+
+      const [usersBody, meBody] = await Promise.all([
+        usersRes.json().catch(() => null),
+        meRes.json().catch(() => null),
+      ]);
+
+      if (!usersRes.ok || !meRes.ok || !meBody?.id) {
+        throw new Error(
+          usersBody?.message ??
+            "Could not load users or verify current session"
+        );
+      }
+
+      setUsers(usersBody);
+      setCurrentUserId(meBody.id);
+    } catch (err) {
+      setUsersError(
+        err instanceof Error ? err.message : "Something went wrong"
+      );
+    } finally {
+      setUsersLoading(false);
+    }
+  }
+
+  async function handleDeleteUser(userId: string) {
+    setDeletingUserId(userId);
+    setDeleteUserError(null);
+
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.message ?? "Failed to delete user");
+      }
+
+      setUsers((prev) => prev.filter((user) => user.id !== userId));
+      setConfirmingUserId(null);
+    } catch (err) {
+      setDeleteUserError(
+        err instanceof Error ? err.message : "Something went wrong"
+      );
+    } finally {
+      setDeletingUserId(null);
+    }
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
@@ -245,6 +323,14 @@ export default function AdminPage() {
             disabled={loggingOut}
           >
             {loggingOut ? "Logging out..." : "Logout"}
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => openUsersModal()}
+          >
+            Users
           </Button>
 
           <Button size="sm" onClick={() => setShowCreateUser(true)}>
@@ -328,6 +414,112 @@ export default function AdminPage() {
               </Button>
             </div>
           </form>
+        </div>
+      )}
+
+      {showUsers && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={closeUsersModal}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="flex max-h-[80vh] w-full max-w-md flex-col gap-3 overflow-y-auto rounded-lg border border-border bg-white p-6 shadow-lg"
+          >
+            <h2 className="font-display text-xl font-bold text-primary">
+              Users
+            </h2>
+
+            {usersLoading && <p className="text-text-light">Loading...</p>}
+
+            {usersError && (
+              <p className="text-sm text-primary-dark">{usersError}</p>
+            )}
+
+            {!usersLoading && !usersError && users.length === 0 && (
+              <p className="text-text-light">No users found.</p>
+            )}
+
+            {!usersLoading && !usersError && (
+              <ul className="flex flex-col gap-2">
+                {users.map((user) => {
+                  const isSelf = user.id === currentUserId;
+                  const isConfirming = confirmingUserId === user.id;
+                  const isDeleting = deletingUserId === user.id;
+
+                  return (
+                    <li
+                      key={user.id}
+                      className="flex items-center justify-between gap-2 rounded border border-border px-3 py-2"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-text-dark">
+                          {user.username}
+                          {isSelf && (
+                            <span className="ml-2 text-xs text-text-light">
+                              (you)
+                            </span>
+                          )}
+                        </p>
+                        <p className="truncate text-sm text-text-light">
+                          {user.email} ·{" "}
+                          {new Date(user.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+
+                      <div className="flex shrink-0 items-center gap-2">
+                        {isConfirming ? (
+                          <>
+                            <span className="text-xs text-text-light">
+                              Delete this user?
+                            </span>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => handleDeleteUser(user.id)}
+                              disabled={deletingUserId !== null}
+                            >
+                              {isDeleting ? "Deleting..." : "Confirm"}
+                            </Button>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => setConfirmingUserId(null)}
+                              disabled={deletingUserId !== null}
+                            >
+                              Cancel
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => setConfirmingUserId(user.id)}
+                            disabled={isSelf || deletingUserId !== null}
+                            title={
+                              isSelf
+                                ? "You cannot delete your own account"
+                                : undefined
+                            }
+                          >
+                            Delete
+                          </Button>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+
+            {deleteUserError && (
+              <p className="text-sm text-primary-dark">{deleteUserError}</p>
+            )}
+
+            <Button variant="secondary" onClick={closeUsersModal}>
+              Close
+            </Button>
+          </div>
         </div>
       )}
 
