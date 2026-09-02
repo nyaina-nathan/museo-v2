@@ -23,6 +23,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${museoModerno.variable} ${hankenGrotesk.variable} h-full antialiased`}
     >
+      <head>
+        <link
+        rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.css" 
+        integrity="sha512-x9WwyMYBnlXMNQ6kQ/Lyzu1NqIhLQKL5Oq6xByfXuRj7s9CskyCbLv/1IjqzJmXwFXWr0ov6jBV7Qbc0hh9nHg==" 
+        crossOrigin="anonymous" 
+        referrerPolicy="no-referrer" />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

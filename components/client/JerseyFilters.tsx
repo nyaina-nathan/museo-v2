@@ -6,6 +6,8 @@ export interface JerseyFiltersValue {
   name: string;
   priceMin: number | null;
   priceMax: number | null;
+  orderBy: "createdAt" | "name" | "price";
+  order: "asc" | "desc";
 }
 
 export interface PriceBounds {
@@ -18,6 +20,8 @@ interface JerseyFiltersProps {
   value: JerseyFiltersValue;
   onNameChange: (name: string) => void;
   onPriceChange: (min: number, max: number) => void;
+  onOrderByChange: (orderBy: JerseyFiltersValue["orderBy"]) => void;
+  onOrderChange: (order: JerseyFiltersValue["order"]) => void;
   onReset: () => void;
   onClose?: () => void;
 }
@@ -30,13 +34,17 @@ export function JerseyFilters({
   value,
   onNameChange,
   onPriceChange,
+  onOrderByChange,
+  onOrderChange,
   onReset,
   onClose,
 }: JerseyFiltersProps) {
   const hasActiveFilters =
     value.name.trim() !== "" ||
     value.priceMin !== null ||
-    value.priceMax !== null;
+    value.priceMax !== null ||
+    value.orderBy !== "createdAt" ||
+    value.order !== "desc";
 
   const lo = value.priceMin ?? bounds?.min ?? null;
   const hi = value.priceMax ?? bounds?.max ?? null;
@@ -140,6 +148,43 @@ export function JerseyFilters({
           </p>
         </fieldset>
       )}
+
+      <fieldset className="flex flex-col gap-4">
+        <legend className="mb-2 text-sm font-medium text-text-dark">
+          Sort
+        </legend>
+
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-text-dark">Order by</span>
+          <select
+            value={value.orderBy}
+            onChange={(event) =>
+              onOrderByChange(
+                event.target.value as JerseyFiltersValue["orderBy"]
+              )
+            }
+            className={inputStyles}
+          >
+            <option value="createdAt">Created date</option>
+            <option value="name">Name</option>
+            <option value="price">Price</option>
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-text-dark">Order</span>
+          <select
+            value={value.order}
+            onChange={(event) =>
+              onOrderChange(event.target.value as JerseyFiltersValue["order"])
+            }
+            className={inputStyles}
+          >
+            <option value="desc">Descending</option>
+            <option value="asc">Ascending</option>
+          </select>
+        </label>
+      </fieldset>
 
       <Button
         variant="ghost"

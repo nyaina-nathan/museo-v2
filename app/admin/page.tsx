@@ -10,6 +10,8 @@ interface FilterState {
   priceMin: string;
   priceMax: string;
   isPublicFilter: "" | "true" | "false";
+  orderBy: "createdAt" | "name" | "price";
+  order: "asc" | "desc";
 }
 
 function buildQueryString(
@@ -35,6 +37,8 @@ function buildQueryString(
     params.set("isPublic", filters.isPublicFilter);
   }
 
+  params.set("orderBy", filters.orderBy);
+  params.set("order", filters.order);
   params.set("page", String(page));
   params.set("limit", String(limit));
 
@@ -46,6 +50,8 @@ const DEFAULT_FILTERS: FilterState = {
   priceMin: "",
   priceMax: "",
   isPublicFilter: "",
+  orderBy: "createdAt",
+  order: "desc",
 };
 
 const inputStyles = "rounded border border-border px-3 py-2 focus:border-primary";
@@ -318,6 +324,41 @@ export default function AdminPage() {
             <option value={20}>20</option>
             <option value={50}>50</option>
             <option value={100}>100</option>
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-1">
+          <span className="text-sm font-medium">Order by</span>
+          <select
+            value={filters.orderBy}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                orderBy: e.target.value as FilterState["orderBy"],
+              })
+            }
+            className={inputStyles}
+          >
+            <option value="createdAt">Created date</option>
+            <option value="name">Name</option>
+            <option value="price">Price</option>
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-1">
+          <span className="text-sm font-medium">Order</span>
+          <select
+            value={filters.order}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                order: e.target.value as FilterState["order"],
+              })
+            }
+            className={inputStyles}
+          >
+            <option value="desc">Descending</option>
+            <option value="asc">Ascending</option>
           </select>
         </label>
 

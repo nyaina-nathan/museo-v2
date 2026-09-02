@@ -27,7 +27,12 @@ export default function CollectionPage() {
   const [name, setName] = useState("");
   const [priceMin, setPriceMin] = useState<number | null>(null);
   const [priceMax, setPriceMax] = useState<number | null>(null);
+  const [orderBy, setOrderBy] = useState<
+    JerseyFiltersValue["orderBy"]
+  >("createdAt");
+  const [order, setOrder] = useState<JerseyFiltersValue["order"]>("desc");
   const [page, setPage] = useState(1);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const debouncedName = useDebouncedValue(name, 300);
   const debouncedPriceMin = useDebouncedValue(priceMin, 300);
@@ -81,6 +86,8 @@ export default function CollectionPage() {
     if (debouncedPriceMax !== null) {
       params.set("priceMax", String(debouncedPriceMax));
     }
+    params.set("orderBy", orderBy);
+    params.set("order", order);
 
     if (requestId === 1) {
       setInitialLoading(true);
@@ -116,12 +123,19 @@ export default function CollectionPage() {
     }
 
     load();
-  }, [debouncedName, debouncedPriceMin, debouncedPriceMax, page]);
+  }, [debouncedName, debouncedPriceMin, debouncedPriceMax, orderBy, order, page]);
 
   const trimmedName = name.trim();
   const hasPriceFilter = priceMin !== null || priceMax !== null;
-  const activeFilterCount = (trimmedName ? 1 : 0) + (hasPriceFilter ? 1 : 0);
-  const filterValue: JerseyFiltersValue = { name, priceMin, priceMax };
+  const hasSort = orderBy !== "createdAt" || order !== "desc";
+  const activeFilterCount = (trimmedName ? 1 : 0) + (hasPriceFilter ? 1 : 0) + (hasSort ? 1 : 0);
+  const filterValue: JerseyFiltersValue = {
+    name,
+    priceMin,
+    priceMax,
+    orderBy,
+    order,
+  };
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const canPrev = page > 1;
   const canNext = page < totalPages;
@@ -137,10 +151,22 @@ export default function CollectionPage() {
     setPage(1);
   }
 
+  function handleOrderByChange(value: JerseyFiltersValue["orderBy"]) {
+    setOrderBy(value);
+    setPage(1);
+  }
+
+  function handleOrderChange(value: JerseyFiltersValue["order"]) {
+    setOrder(value);
+    setPage(1);
+  }
+
   function resetFilters() {
     setName("");
     setPriceMin(null);
     setPriceMax(null);
+    setOrderBy("createdAt");
+    setOrder("desc");
     setPage(1);
   }
 
@@ -169,6 +195,8 @@ export default function CollectionPage() {
                     value={filterValue}
                     onNameChange={handleNameChange}
                     onPriceChange={handlePriceChange}
+                    onOrderByChange={handleOrderByChange}
+                    onOrderChange={handleOrderChange}
                     onReset={resetFilters}
                   />
                 </div>
@@ -193,14 +221,42 @@ export default function CollectionPage() {
                   )}
                 </div>
 
-                <div className="mb-8 rounded-lg border border-border bg-white p-6 lg:hidden">
-                  <JerseyFilters
-                    bounds={bounds}
-                    value={filterValue}
-                    onNameChange={handleNameChange}
-                    onPriceChange={handlePriceChange}
-                    onReset={resetFilters}
-                  />
+                <div className="mb-8 lg:hidden">
+                  <button
+                    type="button"
+                    onClick={() => setFiltersOpen((open) => !open)}
+                    className="flex w-full items-center justify-between gap-4 rounded-lg border border-border bg-white px-6 py-4"
+                  >
+                    <span className="font-display text-base font-bold text-primary">
+                      Filters
+                      {activeFilterCount > 0 && (
+                        <span className="ml-2 rounded bg-primary px-2 py-0.5 text-xs font-semibold text-white">
+                          {activeFilterCount}
+                        </span>
+                      )}
+                    </span>
+                    <span
+                      className={`text-lg leading-none text-text-light transition-transform ${
+                        filtersOpen ? "rotate-180" : ""
+                      }`}
+                    >
+                      <i className="fa-solid fa-chevron-down"></i>
+                    </span>
+                  </button>
+
+                  {filtersOpen && (
+                    <div className="mt-2 rounded-lg border border-border bg-white p-6">
+                      <JerseyFilters
+                        bounds={bounds}
+                        value={filterValue}
+                        onNameChange={handleNameChange}
+                        onPriceChange={handlePriceChange}
+                        onOrderByChange={handleOrderByChange}
+                        onOrderChange={handleOrderChange}
+                        onReset={resetFilters}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {initialLoading && (
