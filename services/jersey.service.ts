@@ -75,6 +75,22 @@ export async function listJerseys(query: ListJerseysQuery): Promise<PaginatedJer
   };
 }
 
+export async function getJerseyPriceRange(): Promise<{
+  min: number | null;
+  max: number | null;
+}> {
+  const result = await prisma.jerseys.aggregate({
+    where: { is_public: true },
+    _min: { price: true },
+    _max: { price: true },
+  });
+
+  return {
+    min: result._min.price ?? null,
+    max: result._max.price ?? null,
+  };
+}
+
 export async function getJersey(id: string): Promise<JerseyWithImages> {
   const row = await prisma.jerseys.findUnique({
     where: { id },

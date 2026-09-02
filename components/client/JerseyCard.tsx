@@ -24,7 +24,7 @@ export function JerseyCard({ jersey, href, liClassName }: JerseyCardProps) {
         )}
       </div>
 
-      <h3 className="truncate font-medium text-text-dark">{jersey.name}</h3>
+      <h3 className="font-medium text-text-dark">{jersey.name}</h3>
 
       <p className="mt-1 text-sm font-medium text-primary">
         {jersey.price !== null ? `Ar ${jersey.price}` : "P.O.A."}
