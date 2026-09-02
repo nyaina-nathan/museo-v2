@@ -5,7 +5,7 @@ const QUICK_LINKS = [
   { label: "Collection", href: "/collection" },
   { label: "Admin", href: "/admin" },
   { label: "FAQ", href: "/faq" },
-  { label: "About Us", href: "/about-us" },
+  { label: "About Us", href: "/about" },
 ];
 
 export function Footer() {

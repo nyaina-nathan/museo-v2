@@ -116,8 +116,8 @@ export default function FAQPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="bg-primary py-20 text-white">
-          <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
-            <div className="mx-auto max-w-[600px] text-center">
+          <div className="mx-auto w-full max-w-7xl px-5 md:px-10 lg:px-15">
+            <div className="mx-auto max-w-150 text-center">
               <h1 className="mb-4 font-display text-4xl font-bold leading-tight md:text-5xl">
                 Frequently Asked Questions
               </h1>
@@ -130,7 +130,7 @@ export default function FAQPage() {
 
         {/* About Our Pieces Section */}
         <section className="bg-white py-20">
-          <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
+          <div className="mx-auto w-full max-w-7xl px-5 md:px-10 lg:px-15">
             <FAQAccordion
               items={aboutPiecesItems}
               sectionTitle="About Our Pieces"
@@ -140,7 +140,7 @@ export default function FAQPage() {
 
         {/* Ordering & Timeline Section */}
         <section className="bg-white py-20">
-          <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
+          <div className="mx-auto w-full max-w-7xl px-5 md:px-10 lg:px-15">
             <FAQAccordion
               items={orderingItems}
               sectionTitle="Ordering & Timeline"
@@ -150,7 +150,7 @@ export default function FAQPage() {
 
         {/* Payment & Delivery Section */}
         <section className="bg-white py-20">
-          <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
+          <div className="mx-auto w-full max-w-7xl px-5 md:px-10 lg:px-15">
             <FAQAccordion
               items={paymentItems}
               sectionTitle="Payment & Delivery"
@@ -160,7 +160,7 @@ export default function FAQPage() {
 
         {/* Returns & Guarantees Section */}
         <section className="bg-white py-20">
-          <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
+          <div className="mx-auto w-full max-w-7xl px-5 md:px-10 lg:px-15">
             <FAQAccordion
               items={guaranteesItems}
               sectionTitle="Returns & Guarantees"
@@ -170,7 +170,7 @@ export default function FAQPage() {
 
         {/* About Museo Section */}
         <section className="bg-white py-20">
-          <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
+          <div className="mx-auto w-full max-w-7xl px-5 md:px-10 lg:px-15">
             <FAQAccordion
               items={aboutMuseoItems}
               sectionTitle="About Museo"
@@ -180,13 +180,13 @@ export default function FAQPage() {
 
         {/* Contact Section */}
         <section className="bg-primary py-20 text-white">
-          <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
-            <div className="mx-auto max-w-[600px] text-center">
+          <div className="mx-auto w-full max-w-7xl px-5 md:px-10 lg:px-15">
+            <div className="mx-auto max-w-150 text-center">
               <h2 className="mb-4 font-display text-3xl font-bold md:text-4xl">
                 Still have questions?
               </h2>
               <p className="mb-8 text-base leading-relaxed opacity-90">
-                Our curator is here to help. Reach out directly and let's discuss
+                Our curator is here to help. Reach out directly and let&apos;s discuss
                 your collection.
               </p>
               <div className="flex flex-col gap-4 sm:flex-row  sm:items-center sm:justify-center">
