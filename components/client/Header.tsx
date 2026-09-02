@@ -62,7 +62,7 @@ export function Header({ transparentOnTop = false }: HeaderProps) {
             </Link>
           ))}
         </nav>
-
+          <Link href='/collection'>
         <Button
           size="sm"
           variant="secondary"
@@ -74,6 +74,7 @@ export function Header({ transparentOnTop = false }: HeaderProps) {
         >
           Explore the archive
         </Button>
+          </Link>
       </div>
     </header>
   );
