@@ -98,24 +98,7 @@ export function JerseySelection() {
 
       {!loading && !error && jerseys.length > 0 && (
         <div className="relative">
-          <button
-            type="button"
-            aria-label="Scroll left"
-            disabled={!canScrollLeft}
-            onClick={() => scrollBy("left")}
-            className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full border-2 border-primary bg-white p-3 text-primary shadow-md transition-colors hover:bg-primary hover:text-white disabled:opacity-50"
-          >
-            &larr;
-          </button>
-          <button
-            type="button"
-            aria-label="Scroll right"
-            disabled={!canScrollRight}
-            onClick={() => scrollBy("right")}
-            className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full border-2 border-primary bg-white p-3 text-primary shadow-md transition-colors hover:bg-primary hover:text-white disabled:opacity-50"
-          >
-            &rarr;
-          </button>
+
 
           <ul
             ref={scrollRef}
