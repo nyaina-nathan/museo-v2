@@ -1,18 +1,24 @@
 const PILLARS = [
   {
-    title: "Authenticity",
+    title: "2 Years of Trust",
     description:
-      "Every piece is verified and documented, so you collect with confidence.",
-  },
-  {
-    title: "Heritage",
-    description:
-      "Jerseys that carry the weight of history and the stories of the legends who wore them.",
-  },
-  {
-    title: "Craftsmanship",
-    description:
-      "Vintage-era construction and materials, preserved and presented with care.",
+      "Honest grading and fair pricing since day one, building a name collectors can rely on.",
+      iconClass: "fa-solid fa-handshake",
+      iconHover: "group-hover:animate-icon-bounce-up"
+    },
+    {
+      title: "100+ Match-Worn Jerseys",
+      description:
+      "Over a hundred authentic match-worn shirts inspected, documented, and matched to the players who wore them.",
+      iconClass: "fa-regular fa-futbol",
+      iconHover: "group-hover:animate-icon-rotate"
+    },
+    {
+      title: "Run by a Passionate Fan",
+      description:
+      "Museo is run by a lifelong supporter and collector who cares about every shirt like their own.",
+      iconClass: "fa-solid fa-heart",
+      iconHover: "group-hover:animate-icon-scale"
   },
 ];
 
@@ -33,8 +39,9 @@ export function WhyUs() {
           {PILLARS.map((pillar) => (
             <li
               key={pillar.title}
-              className="rounded-lg border border-border bg-white p-8"
+              className="group flex flex-col items-center w-full rounded-lg border border-border bg-white p-8"
             >
+              <i className={`${pillar.iconClass} ${pillar.iconHover} text-5xl p-4`}></i>
               <h3 className="font-display text-xl font-bold text-primary">
                 {pillar.title}
               </h3>
