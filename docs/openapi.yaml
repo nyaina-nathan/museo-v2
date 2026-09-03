@@ -1,7 +1,20 @@
 openapi: 3.1.0
 info:
   title: Museo API
-  description: API for managing users, jerseys, and jersey images.
+  description: |
+    API for managing users, jerseys, and jersey images.
+
+    ## Authentication
+
+    Sessions use a JWT stored in an HttpOnly cookie named `session`
+    (SameSite=Lax, 7-day max-age, `secure` in production).
+
+    A Next.js middleware (`proxy.ts`) protects `/admin/*` and every non-GET
+    `/api/*` request except `POST /api/auth/login`. Unauthenticated requests
+    to protected endpoints are answered with a `307` redirect to `/home`
+    before reaching the route handler. `GET /api/users` additionally checks
+    the session inside the handler and returns `401` when the session user
+    no longer exists.
   version: 1.0.0
 servers:
   - url: /
@@ -12,6 +25,12 @@ paths:
       tags:
         - Auth
       summary: Register a new user
+      description: >-
+        Creates a user account. Like all non-GET `/api/*` requests except
+        login, this endpoint is protected by the session middleware, so an
+        existing session is required.
+      security:
+        - SessionCookie: []
       requestBody:
         required: true
         content:
@@ -25,6 +44,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '307':
+          $ref: '#/components/responses/NotAuthenticatedRedirect'
         '400':
           $ref: '#/components/responses/BadRequest'
         '409':
@@ -61,6 +82,23 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/auth/logout:
+    post:
+      operationId: logout
+      tags:
+        - Auth
+      summary: Log out and end the session
+      description: Clears the session cookie. Protected by the session middleware.
+      security:
+        - SessionCookie: []
+      responses:
+        '204':
+          description: Logged out, session cookie cleared
+        '307':
+          $ref: '#/components/responses/NotAuthenticatedRedirect'
 
   /api/auth/me:
     get:
@@ -78,19 +116,6 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /api/auth/logout:
-    post:
-      operationId: logout
-      tags:
-        - Auth
-      summary: Log out and end the session
-      description: Clears the session cookie.
-      responses:
-        '204':
-          description: Logged out, session cookie cleared
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-
   /api/jerseys:
     get:
       operationId: listJerseys
@@ -103,7 +128,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Filter by jersey name (partial match)
+          description: Filter by jersey name (case-insensitive partial match)
         - name: priceMin
           in: query
           required: false
@@ -124,6 +149,8 @@ paths:
           schema:
             type: boolean
           description: Filter by public/private visibility
+        - $ref: '#/components/parameters/OrderBy'
+        - $ref: '#/components/parameters/Order'
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/Limit'
       responses:
@@ -152,11 +179,15 @@ paths:
                   total:
                     type: integer
                     minimum: 0
+        '422':
+          $ref: '#/components/responses/ValidationError'
     post:
       operationId: createJersey
       tags:
         - Jerseys
       summary: Create a jersey
+      security:
+        - SessionCookie: []
       requestBody:
         required: true
         content:
@@ -170,10 +201,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Jersey'
+        '307':
+          $ref: '#/components/responses/NotAuthenticatedRedirect'
         '400':
           $ref: '#/components/responses/BadRequest'
         '422':
           $ref: '#/components/responses/ValidationError'
+
+  /api/jerseys/price-range:
+    get:
+      operationId: getJerseyPriceRange
+      tags:
+        - Jerseys
+      summary: Get the price range of public jerseys
+      description: >-
+        Returns the minimum and maximum price across all public jerseys, or
+        null values when no public jersey has a price.
+      responses:
+        '200':
+          description: Price range
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceRange'
 
   /api/jerseys/{jerseyId}:
     parameters:
@@ -197,6 +247,8 @@ paths:
       tags:
         - Jerseys
       summary: Update a jersey
+      security:
+        - SessionCookie: []
       requestBody:
         required: true
         content:
@@ -210,6 +262,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Jersey'
+        '307':
+          $ref: '#/components/responses/NotAuthenticatedRedirect'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -222,9 +276,13 @@ paths:
         - Jerseys
       summary: Delete a jersey
       description: Cascades to the jersey's images.
+      security:
+        - SessionCookie: []
       responses:
         '204':
           description: Jersey deleted
+        '307':
+          $ref: '#/components/responses/NotAuthenticatedRedirect'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -257,33 +315,17 @@ paths:
         `/api/image-kit/auth`). This endpoint persists the resulting URL. If
         `title` is omitted, it defaults to the last path segment of `url`. The
         optional `file_id` (returned by ImageKit on upload) allows the server to
-        remove the file from ImageKit when the image is deleted.
+        remove the file from ImageKit when the image is deleted. When
+        `is_primary` is true, any previously primary image of the jersey is
+        unset.
+      security:
+        - SessionCookie: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - url
-              properties:
-                url:
-                  type: string
-                  format: uri
-                  description: Publicly accessible image URL returned by ImageKit
-                title:
-                  type: string
-                  maxLength: 255
-                  description: Optional display title, defaults to the last path segment of the URL
-                file_id:
-                  type: string
-                  description: ImageKit fileId returned on upload, used for server-side cleanup
-                is_primary:
-                  type: boolean
-                  default: false
-                  description: >-
-                    When true, marks this image as the primary image for the
-                    jersey. Any previously primary image is unset.
+              $ref: '#/components/schemas/JerseyImageInput'
       responses:
         '201':
           description: Image registered
@@ -291,10 +333,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JerseyImage'
+        '307':
+          $ref: '#/components/responses/NotAuthenticatedRedirect'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
 
   /api/jerseys/{jerseyId}/images/{imageId}:
     parameters:
@@ -314,14 +360,50 @@ paths:
                 $ref: '#/components/schemas/JerseyImage'
         '404':
           $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: updateJerseyImage
+      tags:
+        - Jersey Images
+      summary: Update a jersey image
+      description: Renames the image by setting a new title.
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JerseyImagePatchInput'
+      responses:
+        '200':
+          description: Updated jersey image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JerseyImage'
+        '307':
+          $ref: '#/components/responses/NotAuthenticatedRedirect'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     delete:
       operationId: deleteJerseyImage
       tags:
         - Jersey Images
       summary: Delete a jersey image
+      description: >-
+        Deletes the image and removes the underlying file from ImageKit when a
+        `file_id` is stored (cleanup failures are logged and ignored).
+      security:
+        - SessionCookie: []
       responses:
         '204':
           description: Jersey image deleted
+        '307':
+          $ref: '#/components/responses/NotAuthenticatedRedirect'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -337,6 +419,8 @@ paths:
       description: >-
         Sets the given image as the primary image for the jersey. Only one
         image can be primary at a time; any previously primary image is unset.
+      security:
+        - SessionCookie: []
       responses:
         '200':
           description: Updated jersey image
@@ -344,10 +428,87 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JerseyImage'
+        '307':
+          $ref: '#/components/responses/NotAuthenticatedRedirect'
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/users:
+    get:
+      operationId: listUsers
+      tags:
+        - Users
+      summary: List users
+      description: >-
+        Requires a valid session whose user still exists; otherwise returns
+        `401`.
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/users/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/UserId'
+    delete:
+      operationId: deleteUser
+      tags:
+        - Users
+      summary: Delete a user
+      description: >-
+        Fails with `409` when attempting to delete the last remaining user.
+        Returns `401` when the session user no longer exists.
+      security:
+        - SessionCookie: []
+      responses:
+        '204':
+          description: User deleted
+        '307':
+          $ref: '#/components/responses/NotAuthenticatedRedirect'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/image-kit/auth:
+    get:
+      operationId: getImageKitUploadAuthParams
+      tags:
+        - ImageKit
+      summary: Get signed upload parameters for ImageKit
+      description: >-
+        Returns the authentication parameters required by the ImageKit browser
+        upload SDK. The signature is computed server-side with the ImageKit
+        private key; the file upload itself happens directly from the client.
+      responses:
+        '200':
+          description: Upload authentication parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageKitAuthParams'
+
 components:
+  securitySchemes:
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
+      description: >-
+        JWT session cookie set by `POST /api/auth/login` (HttpOnly,
+        SameSite=Lax, 7-day max-age).
+
   parameters:
     JerseyId:
       name: jerseyId
@@ -363,6 +524,36 @@ components:
       schema:
         type: string
         format: uuid
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    OrderBy:
+      name: orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - createdAt
+          - name
+          - price
+        default: createdAt
+      description: Field to sort jerseys by
+    Order:
+      name: order
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        default: desc
+      description: Sort direction
     Page:
       name: page
       in: query
@@ -382,6 +573,11 @@ components:
         default: 20
 
   responses:
+    NotAuthenticatedRedirect:
+      description: >-
+        Not authenticated. The session middleware redirects requests to
+        `/admin/*` and non-GET `/api/*` endpoints (except login) to `/home`
+        before the route handler runs.
     BadRequest:
       description: Malformed request
       content:
@@ -604,12 +800,86 @@ components:
           format: uri
           description: Assigned by the client after uploading to ImageKit
         file_id:
-          type: string
-          nullable: true
+          type:
+            - string
+            - 'null'
           description: ImageKit fileId used for server-side cleanup
         is_primary:
           type: boolean
           description: Whether this image is the primary image for the jersey
+
+    JerseyImageInput:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          format: uri
+          maxLength: 2048
+          description: Publicly accessible image URL returned by ImageKit
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Optional display title, defaults to the last path segment of the URL
+        file_id:
+          type: string
+          description: ImageKit fileId returned on upload, used for server-side cleanup
+        is_primary:
+          type: boolean
+          default: false
+          description: >-
+            When true, marks this image as the primary image for the jersey.
+            Any previously primary image is unset.
+
+    JerseyImagePatchInput:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+
+    PriceRange:
+      type: object
+      required:
+        - min
+        - max
+      properties:
+        min:
+          type:
+            - integer
+            - 'null'
+          description: Lowest price among public jerseys, or null when none has a price
+        max:
+          type:
+            - integer
+            - 'null'
+          description: Highest price among public jerseys, or null when none has a price
+
+    ImageKitAuthParams:
+      type: object
+      required:
+        - token
+        - expire
+        - signature
+        - publicKey
+      properties:
+        token:
+          type: string
+          description: Unique upload token (generated UUID)
+        expire:
+          type: integer
+          description: Signature expiration as a UNIX timestamp in seconds (defaults to 30 minutes ahead)
+        signature:
+          type: string
+          description: HMAC signature computed with the ImageKit private key
+        publicKey:
+          type: string
+          description: ImageKit public key
 
 tags:
   - name: Auth
@@ -617,4 +887,8 @@ tags:
   - name: Jerseys
     description: CRUD for jerseys
   - name: Jersey Images
-    description: Image uploads attached to a jersey
+    description: Images attached to a jersey
+  - name: Users
+    description: User administration
+  - name: ImageKit
+    description: Signed upload parameters for ImageKit
