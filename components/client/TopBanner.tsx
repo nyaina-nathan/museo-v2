@@ -2,23 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { SocialLinks } from "@/components/client/SocialLinks";
-
-const BANNER_MESSAGES = [
-  "100% authentic",
-  "On command",
-  "Deliver everywhere",
-];
+import { useDictionary } from "@/libs/i18n/locale-provider";
 
 export function TopBanner() {
   const [messageIndex, setMessageIndex] = useState(0);
+  const dict = useDictionary();
+  const messages = dict.banner.messages;
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setMessageIndex((current) => (current + 1) % BANNER_MESSAGES.length);
+      setMessageIndex((current) => (current + 1) % messages.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [messages.length]);
 
   return (
     <div className="bg-primary text-white">
@@ -32,7 +29,7 @@ export function TopBanner() {
           className="text-center text-xs font-medium uppercase tracking-[0.2em] text-white"
         >
           <span key={messageIndex} className="animate-banner-message block">
-            {BANNER_MESSAGES[messageIndex]}
+            {messages[messageIndex]}
           </span>
         </p>
 

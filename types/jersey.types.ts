@@ -1,7 +1,8 @@
 export interface Jersey {
   id: string;
   name: string;
-  description: string | null;
+  en_description: string | null;
+  fr_description: string | null;
   is_public: boolean;
   price: number | null;
   created_at: string;
@@ -15,14 +16,16 @@ export interface JerseyWithImages extends Jersey {
 
 export interface JerseyInput {
   name: string;
-  description?: string | null;
+  en_description?: string | null;
+  fr_description?: string | null;
   is_public?: boolean;
   price?: number | null;
 }
 
 export interface JerseyPatchInput {
   name?: string;
-  description?: string | null;
+  en_description?: string | null;
+  fr_description?: string | null;
   is_public?: boolean;
   price?: number | null;
 }

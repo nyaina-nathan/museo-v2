@@ -1,4 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import type { Locale } from "@/libs/i18n/config";
+import { localizeDescription } from "@/libs/i18n/jersey-description";
+import { useDictionary, useLocale } from "@/libs/i18n/locale-provider";
 import type { Jersey } from "@/types/jersey.types";
 
 interface JerseyCardProps {
@@ -8,11 +13,19 @@ interface JerseyCardProps {
   tabIndex?: number;
 }
 
-const priceFormatter = new Intl.NumberFormat("fr-MG");
+const priceFormatters: Record<Locale, Intl.NumberFormat> = {
+  en: new Intl.NumberFormat("en-MG"),
+  fr: new Intl.NumberFormat("fr-MG"),
+};
 
 export function JerseyCard({ jersey, href, liClassName, tabIndex }: JerseyCardProps) {
+  const locale = useLocale();
+  const dict = useDictionary();
+  const description = localizeDescription(jersey, locale);
   const formattedPrice =
-    jersey.price !== null ? `Ar ${priceFormatter.format(jersey.price)}` : "P.O.A.";
+    jersey.price !== null
+      ? `Ar ${priceFormatters[locale].format(jersey.price)}`
+      : dict.jerseyCard.poa;
 
   const content = (
     <article className="group relative my-2 flex h-full flex-col border-2 border-primary bg-white p-4 transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform hover:-translate-y-1 hover:shadow-[0_14px_30px_-10px_rgba(120,29,10,0.18)] active:scale-[0.98] active:duration-100 motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100">
@@ -30,7 +43,7 @@ export function JerseyCard({ jersey, href, liClassName, tabIndex }: JerseyCardPr
               {jersey.name.charAt(0).toUpperCase()}
             </span>
             <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-primary/40">
-              Archive Piece
+              {dict.jerseyCard.archivePiece}
             </span>
           </div>
         )}
@@ -41,13 +54,13 @@ export function JerseyCard({ jersey, href, liClassName, tabIndex }: JerseyCardPr
           {jersey.name}
         </h3>
 
-        {jersey.description ? (
+        {description ? (
           <p className="mt-1.5 mb-4 line-clamp-2 text-xs leading-[1.5] text-text-light">
-            {jersey.description}
+            {description}
           </p>
         ) : (
           <p className="mt-1.5 mb-4 text-xs italic leading-[1.5] text-text-light/60">
-            Curated archive piece
+            {dict.jerseyCard.curated}
           </p>
         )}
 
@@ -58,7 +71,7 @@ export function JerseyCard({ jersey, href, liClassName, tabIndex }: JerseyCardPr
 
           {href && (
             <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-primary/75 transition-colors duration-200 group-hover:text-primary">
-              <span>Explore</span>
+              <span>{dict.jerseyCard.explore}</span>
               <span
                 aria-hidden="true"
                 className="inline-block transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"

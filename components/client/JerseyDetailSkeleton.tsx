@@ -1,10 +1,15 @@
+"use client";
+
 import { Skeleton } from "@/components/ui/Skeleton";
+import { useDictionary } from "@/libs/i18n/locale-provider";
 
 export function JerseyDetailSkeleton() {
+  const dict = useDictionary();
+
   return (
     <section className="bg-white py-20" aria-busy="true">
       <span role="status" className="sr-only">
-        Loading this piece…
+        {dict.detail.loading}
       </span>
 
       <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">

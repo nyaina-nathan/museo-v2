@@ -7,11 +7,17 @@ import { Footer } from "@/components/client/Footer";
 import { JerseyDetailSkeleton } from "@/components/client/JerseyDetailSkeleton";
 import { SocialLinks } from "@/components/client/SocialLinks";
 import { Button } from "@/components/ui/Button";
+import { formatMessage } from "@/libs/i18n/format";
+import { localizeDescription } from "@/libs/i18n/jersey-description";
+import { useDictionary, useLocale } from "@/libs/i18n/locale-provider";
+import { localePath } from "@/libs/i18n/paths";
 import type { Jersey, JerseyImage } from "@/types/jersey.types";
 
 export default function CollectionDetailPage() {
   const { collectionId } = useParams<{ collectionId: string }>();
   const router = useRouter();
+  const locale = useLocale();
+  const dict = useDictionary();
 
   const [jersey, setJersey] = useState<Jersey | null>(null);
   const [images, setImages] = useState<JerseyImage[]>([]);
@@ -31,7 +37,7 @@ export default function CollectionDetailPage() {
 
         if (!jerseyResponse.ok) {
           const body = await jerseyResponse.json().catch(() => null);
-          throw new Error(body?.message ?? "Failed to load this piece");
+          throw new Error(body?.message ?? dict.detail.loadError);
         }
 
         const jerseyData: Jersey = await jerseyResponse.json();
@@ -51,7 +57,9 @@ export default function CollectionDetailPage() {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Something went wrong");
+          setError(
+            err instanceof Error ? err.message : dict.detail.somethingWrong
+          );
         }
       } finally {
         if (!cancelled) {
@@ -65,7 +73,7 @@ export default function CollectionDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [collectionId]);
+  }, [collectionId, dict]);
 
   if (loading) {
     return (
@@ -86,17 +94,15 @@ export default function CollectionDetailPage() {
         <main className="flex-1">
           <div className="py-24 text-center">
             <p className="text-primary-dark">
-              {error === "Jersey not found"
-                ? "We couldn't locate this artifact."
-                : error}
+              {error === "Jersey not found" ? dict.detail.notFound : error}
             </p>
             <Button
               variant="ghost"
               size="sm"
               className="mt-4"
-              onClick={() => router.push("/collection")}
+              onClick={() => router.push(localePath(locale, "/collection"))}
             >
-              Back to the collection
+              {dict.detail.backToCollection}
             </Button>
           </div>
         </main>
@@ -109,6 +115,7 @@ export default function CollectionDetailPage() {
     return null;
   }
 
+  const description = localizeDescription(jersey, locale);
   const activeImage =
     images.find((image) => image.id === activeImageId) ??
     images.find((image) => image.is_primary) ??
@@ -123,10 +130,10 @@ export default function CollectionDetailPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push("/collection")}
+              onClick={() => router.push(localePath(locale, "/collection"))}
               className="mb-10"
             >
-              Back to the collection
+              {dict.detail.backToCollection}
             </Button>
 
             <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
@@ -153,7 +160,9 @@ export default function CollectionDetailPage() {
                                 type="button"
                                 onClick={() => setActiveImageId(image.id)}
                                 aria-pressed={selected}
-                                aria-label={`View ${image.title}`}
+                                aria-label={formatMessage(dict.detail.viewImage, {
+                                  title: image.title,
+                                })}
                                 className={`block w-full overflow-hidden rounded bg-primary/5 transition ${
                                   selected
                                     ? "ring-2 ring-primary"
@@ -176,7 +185,7 @@ export default function CollectionDetailPage() {
                 ) : (
                   <div className="flex aspect-square w-full items-center justify-center rounded bg-primary/5 p-8">
                     <p className="text-center text-text-light">
-                      This piece awaits its visual testimony.
+                      {dict.detail.noImage}
                     </p>
                   </div>
                 )}
@@ -194,7 +203,7 @@ export default function CollectionDetailPage() {
                 )}
 
                 <p className="mt-6 max-w-prose text-base leading-relaxed text-text-light">
-                  {jersey.description ?? "This piece awaits its story."}
+                  {description ?? dict.detail.noDescription}
                 </p>
 
                 <div className="mt-8 flex items-center gap-3">

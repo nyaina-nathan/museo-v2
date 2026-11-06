@@ -13,11 +13,16 @@ import {
 } from "@/components/client/JerseyFilters";
 import { Button } from "@/components/ui/Button";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { formatMessage } from "@/libs/i18n/format";
+import { useDictionary, useLocale } from "@/libs/i18n/locale-provider";
+import { localePath } from "@/libs/i18n/paths";
 import type { Jersey } from "@/types/jersey.types";
 
 const PAGE_SIZE = 10;
 
 export default function CollectionPage() {
+  const locale = useLocale();
+  const dict = useDictionary();
   const [jerseys, setJerseys] = useState<Jersey[]>([]);
   const [total, setTotal] = useState(0);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -51,7 +56,7 @@ export default function CollectionPage() {
 
         if (!response.ok) {
           const body = await response.json().catch(() => null);
-          throw new Error(body?.message ?? "Failed to load the price range");
+          throw new Error(body?.message ?? dict.collection.priceRangeError);
         }
 
         const result = await response.json();
@@ -69,7 +74,7 @@ export default function CollectionPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [dict]);
 
   useEffect(() => {
     const requestId = ++requestIdRef.current;
@@ -103,7 +108,7 @@ export default function CollectionPage() {
 
         if (!response.ok) {
           const body = await response.json().catch(() => null);
-          throw new Error(body?.message ?? "Failed to load the collection");
+          throw new Error(body?.message ?? dict.collection.loadError);
         }
 
         const result = await response.json();
@@ -115,7 +120,9 @@ export default function CollectionPage() {
         setError(null);
       } catch (err) {
         if (requestIdRef.current !== requestId) return;
-        setError(err instanceof Error ? err.message : "Something went wrong");
+        setError(
+          err instanceof Error ? err.message : dict.collection.somethingWrong
+        );
       } finally {
         if (requestIdRef.current === requestId) {
           setInitialLoading(false);
@@ -125,7 +132,15 @@ export default function CollectionPage() {
     }
 
     load();
-  }, [debouncedName, debouncedPriceMin, debouncedPriceMax, orderBy, order, page]);
+  }, [
+    debouncedName,
+    debouncedPriceMin,
+    debouncedPriceMax,
+    orderBy,
+    order,
+    page,
+    dict,
+  ]);
 
   useEffect(() => {
     if (initialLoading) return;
@@ -189,10 +204,10 @@ export default function CollectionPage() {
           <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:max-w-none lg:px-[60px]">
             <div className="mx-auto mb-12 max-w-[600px] text-center">
               <h1 className="font-display text-3xl font-bold text-primary md:text-4xl">
-                The Collection
+                {dict.collection.title}
               </h1>
               <p className="mt-3 text-base leading-relaxed text-text-light">
-                Every piece in the archive, ready to be discovered.
+                {dict.collection.subtitle}
               </p>
             </div>
 
@@ -215,7 +230,11 @@ export default function CollectionPage() {
                 <div className="mb-6 flex items-center justify-between gap-4">
                   <p className="text-sm text-text-light" aria-live="polite">
                     {!initialLoading && !error
-                      ? `${total} ${total === 1 ? "piece" : "pieces"}`
+                      ? `${total} ${
+                          total === 1
+                            ? dict.collection.piecesOne
+                            : dict.collection.piecesMany
+                        }`
                       : "\u00A0"}
                   </p>
                   {activeFilterCount > 0 && (
@@ -225,7 +244,9 @@ export default function CollectionPage() {
                       className="lg:hidden"
                       onClick={resetFilters}
                     >
-                      Clear filters ({activeFilterCount})
+                      {formatMessage(dict.collection.clearFiltersWithCount, {
+                        count: activeFilterCount,
+                      })}
                     </Button>
                   )}
                 </div>
@@ -237,7 +258,7 @@ export default function CollectionPage() {
                     className="flex w-full items-center justify-between gap-4 rounded-lg border border-border bg-white px-6 py-4"
                   >
                     <span className="font-display text-base font-bold text-primary">
-                      Filters
+                      {dict.collection.filters}
                       {activeFilterCount > 0 && (
                         <span className="ml-2 rounded bg-primary px-2 py-0.5 text-xs font-semibold text-white">
                           {activeFilterCount}
@@ -276,7 +297,7 @@ export default function CollectionPage() {
                   (activeFilterCount > 0 ? (
                     <div className="py-10 text-center">
                       <p className="text-text-light">
-                        No pieces match your filters.
+                        {dict.collection.noMatches}
                       </p>
                       <Button
                         variant="secondary"
@@ -284,12 +305,12 @@ export default function CollectionPage() {
                         className="mt-4"
                         onClick={resetFilters}
                       >
-                        Clear filters
+                        {dict.collection.clearFilters}
                       </Button>
                     </div>
                   ) : (
                     <p className="text-center text-text-light">
-                      Begin your archive. Explore our current pieces.
+                      {dict.collection.empty}
                     </p>
                   ))}
 
@@ -297,7 +318,7 @@ export default function CollectionPage() {
                   <div className="relative grid grid-cols-1">
                     {initialLoading && (
                       <span role="status" className="sr-only">
-                        Loading the collection…
+                        {dict.collection.loading}
                       </span>
                     )}
 
@@ -326,14 +347,17 @@ export default function CollectionPage() {
                             <JerseyCard
                               key={jersey.id}
                               jersey={jersey}
-                              href={`/collection/${jersey.id}`}
+                              href={localePath(
+                                locale,
+                                `/collection/${jersey.id}`
+                              )}
                             />
                           ))}
                         </ul>
 
                         {refreshing && (
                           <p className="mt-6 text-center text-sm text-text-light">
-                            Refreshing…
+                            {dict.collection.refreshing}
                           </p>
                         )}
                       </div>
@@ -343,7 +367,7 @@ export default function CollectionPage() {
 
                 {!initialLoading && !error && jerseys.length > 0 && (
                   <nav
-                    aria-label="Pagination"
+                    aria-label={dict.collection.pagination}
                     className="mt-12 flex items-center justify-center gap-4"
                   >
                     <Button
@@ -352,10 +376,13 @@ export default function CollectionPage() {
                       disabled={!canPrev}
                       onClick={() => setPage((p) => p - 1)}
                     >
-                      Previous
+                      {dict.collection.previous}
                     </Button>
                     <p className="text-sm text-text-light">
-                      Page {page} of {totalPages}
+                      {formatMessage(dict.collection.pageOf, {
+                        page,
+                        totalPages,
+                      })}
                     </p>
                     <Button
                       variant="secondary"
@@ -363,15 +390,17 @@ export default function CollectionPage() {
                       disabled={!canNext}
                       onClick={() => setPage((p) => p + 1)}
                     >
-                      Next
+                      {dict.collection.next}
                     </Button>
                   </nav>
                 )}
 
                 {!initialLoading && !error && jerseys.length > 0 && (
                   <div className="mt-12 text-center">
-                    <Link href="/">
-                      <Button variant="secondary">Back to home</Button>
+                    <Link href={localePath(locale, "/home")}>
+                      <Button variant="secondary">
+                        {dict.collection.backToHome}
+                      </Button>
                     </Link>
                   </div>
                 )}

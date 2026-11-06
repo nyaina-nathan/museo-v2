@@ -19,14 +19,15 @@ model jersey_images {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model jerseys {
-  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String          @db.VarChar
-  description   String?
-  is_public     Boolean?        @default(true)
-  price         Int?
-  created_at    DateTime?       @default(now()) @db.Timestamptz(6)
-  updated_at    DateTime?       @db.Timestamptz(6)
-  jersey_images jersey_images[]
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String          @db.VarChar
+  is_public      Boolean?        @default(true)
+  price          Int?
+  created_at     DateTime?       @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime?       @db.Timestamptz(6)
+  fr_description String?
+  en_description String?
+  jersey_images  jersey_images[]
 }
 
 model users {

@@ -37,31 +37,34 @@ export type JerseysSumAggregateOutputType = {
 export type JerseysMinAggregateOutputType = {
   id: string | null
   name: string | null
-  description: string | null
   is_public: boolean | null
   price: number | null
   created_at: Date | null
   updated_at: Date | null
+  fr_description: string | null
+  en_description: string | null
 }
 
 export type JerseysMaxAggregateOutputType = {
   id: string | null
   name: string | null
-  description: string | null
   is_public: boolean | null
   price: number | null
   created_at: Date | null
   updated_at: Date | null
+  fr_description: string | null
+  en_description: string | null
 }
 
 export type JerseysCountAggregateOutputType = {
   id: number
   name: number
-  description: number
   is_public: number
   price: number
   created_at: number
   updated_at: number
+  fr_description: number
+  en_description: number
   _all: number
 }
 
@@ -77,31 +80,34 @@ export type JerseysSumAggregateInputType = {
 export type JerseysMinAggregateInputType = {
   id?: true
   name?: true
-  description?: true
   is_public?: true
   price?: true
   created_at?: true
   updated_at?: true
+  fr_description?: true
+  en_description?: true
 }
 
 export type JerseysMaxAggregateInputType = {
   id?: true
   name?: true
-  description?: true
   is_public?: true
   price?: true
   created_at?: true
   updated_at?: true
+  fr_description?: true
+  en_description?: true
 }
 
 export type JerseysCountAggregateInputType = {
   id?: true
   name?: true
-  description?: true
   is_public?: true
   price?: true
   created_at?: true
   updated_at?: true
+  fr_description?: true
+  en_description?: true
   _all?: true
 }
 
@@ -194,11 +200,12 @@ export type jerseysGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type JerseysGroupByOutputType = {
   id: string
   name: string
-  description: string | null
   is_public: boolean | null
   price: number | null
   created_at: Date | null
   updated_at: Date | null
+  fr_description: string | null
+  en_description: string | null
   _count: JerseysCountAggregateOutputType | null
   _avg: JerseysAvgAggregateOutputType | null
   _sum: JerseysSumAggregateOutputType | null
@@ -227,22 +234,24 @@ export type jerseysWhereInput = {
   NOT?: Prisma.jerseysWhereInput | Prisma.jerseysWhereInput[]
   id?: Prisma.UuidFilter<"jerseys"> | string
   name?: Prisma.StringFilter<"jerseys"> | string
-  description?: Prisma.StringNullableFilter<"jerseys"> | string | null
   is_public?: Prisma.BoolNullableFilter<"jerseys"> | boolean | null
   price?: Prisma.IntNullableFilter<"jerseys"> | number | null
   created_at?: Prisma.DateTimeNullableFilter<"jerseys"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"jerseys"> | Date | string | null
+  fr_description?: Prisma.StringNullableFilter<"jerseys"> | string | null
+  en_description?: Prisma.StringNullableFilter<"jerseys"> | string | null
   jersey_images?: Prisma.Jersey_imagesListRelationFilter
 }
 
 export type jerseysOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  description?: Prisma.SortOrderInput | Prisma.SortOrder
   is_public?: Prisma.SortOrderInput | Prisma.SortOrder
   price?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  fr_description?: Prisma.SortOrderInput | Prisma.SortOrder
+  en_description?: Prisma.SortOrderInput | Prisma.SortOrder
   jersey_images?: Prisma.jersey_imagesOrderByRelationAggregateInput
 }
 
@@ -252,22 +261,24 @@ export type jerseysWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.jerseysWhereInput[]
   NOT?: Prisma.jerseysWhereInput | Prisma.jerseysWhereInput[]
   name?: Prisma.StringFilter<"jerseys"> | string
-  description?: Prisma.StringNullableFilter<"jerseys"> | string | null
   is_public?: Prisma.BoolNullableFilter<"jerseys"> | boolean | null
   price?: Prisma.IntNullableFilter<"jerseys"> | number | null
   created_at?: Prisma.DateTimeNullableFilter<"jerseys"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"jerseys"> | Date | string | null
+  fr_description?: Prisma.StringNullableFilter<"jerseys"> | string | null
+  en_description?: Prisma.StringNullableFilter<"jerseys"> | string | null
   jersey_images?: Prisma.Jersey_imagesListRelationFilter
 }, "id">
 
 export type jerseysOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  description?: Prisma.SortOrderInput | Prisma.SortOrder
   is_public?: Prisma.SortOrderInput | Prisma.SortOrder
   price?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  fr_description?: Prisma.SortOrderInput | Prisma.SortOrder
+  en_description?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.jerseysCountOrderByAggregateInput
   _avg?: Prisma.jerseysAvgOrderByAggregateInput
   _max?: Prisma.jerseysMaxOrderByAggregateInput
@@ -281,85 +292,93 @@ export type jerseysScalarWhereWithAggregatesInput = {
   NOT?: Prisma.jerseysScalarWhereWithAggregatesInput | Prisma.jerseysScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"jerseys"> | string
   name?: Prisma.StringWithAggregatesFilter<"jerseys"> | string
-  description?: Prisma.StringNullableWithAggregatesFilter<"jerseys"> | string | null
   is_public?: Prisma.BoolNullableWithAggregatesFilter<"jerseys"> | boolean | null
   price?: Prisma.IntNullableWithAggregatesFilter<"jerseys"> | number | null
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"jerseys"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"jerseys"> | Date | string | null
+  fr_description?: Prisma.StringNullableWithAggregatesFilter<"jerseys"> | string | null
+  en_description?: Prisma.StringNullableWithAggregatesFilter<"jerseys"> | string | null
 }
 
 export type jerseysCreateInput = {
   id?: string
   name: string
-  description?: string | null
   is_public?: boolean | null
   price?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  fr_description?: string | null
+  en_description?: string | null
   jersey_images?: Prisma.jersey_imagesCreateNestedManyWithoutJerseysInput
 }
 
 export type jerseysUncheckedCreateInput = {
   id?: string
   name: string
-  description?: string | null
   is_public?: boolean | null
   price?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  fr_description?: string | null
+  en_description?: string | null
   jersey_images?: Prisma.jersey_imagesUncheckedCreateNestedManyWithoutJerseysInput
 }
 
 export type jerseysUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   price?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fr_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  en_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jersey_images?: Prisma.jersey_imagesUpdateManyWithoutJerseysNestedInput
 }
 
 export type jerseysUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   price?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fr_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  en_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jersey_images?: Prisma.jersey_imagesUncheckedUpdateManyWithoutJerseysNestedInput
 }
 
 export type jerseysCreateManyInput = {
   id?: string
   name: string
-  description?: string | null
   is_public?: boolean | null
   price?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  fr_description?: string | null
+  en_description?: string | null
 }
 
 export type jerseysUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   price?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fr_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  en_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type jerseysUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   price?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fr_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  en_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type JerseysScalarRelationFilter = {
@@ -370,11 +389,12 @@ export type JerseysScalarRelationFilter = {
 export type jerseysCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  description?: Prisma.SortOrder
   is_public?: Prisma.SortOrder
   price?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  fr_description?: Prisma.SortOrder
+  en_description?: Prisma.SortOrder
 }
 
 export type jerseysAvgOrderByAggregateInput = {
@@ -384,21 +404,23 @@ export type jerseysAvgOrderByAggregateInput = {
 export type jerseysMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  description?: Prisma.SortOrder
   is_public?: Prisma.SortOrder
   price?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  fr_description?: Prisma.SortOrder
+  en_description?: Prisma.SortOrder
 }
 
 export type jerseysMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  description?: Prisma.SortOrder
   is_public?: Prisma.SortOrder
   price?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  fr_description?: Prisma.SortOrder
+  en_description?: Prisma.SortOrder
 }
 
 export type jerseysSumOrderByAggregateInput = {
@@ -434,21 +456,23 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 export type jerseysCreateWithoutJersey_imagesInput = {
   id?: string
   name: string
-  description?: string | null
   is_public?: boolean | null
   price?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  fr_description?: string | null
+  en_description?: string | null
 }
 
 export type jerseysUncheckedCreateWithoutJersey_imagesInput = {
   id?: string
   name: string
-  description?: string | null
   is_public?: boolean | null
   price?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  fr_description?: string | null
+  en_description?: string | null
 }
 
 export type jerseysCreateOrConnectWithoutJersey_imagesInput = {
@@ -470,21 +494,23 @@ export type jerseysUpdateToOneWithWhereWithoutJersey_imagesInput = {
 export type jerseysUpdateWithoutJersey_imagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   price?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fr_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  en_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type jerseysUncheckedUpdateWithoutJersey_imagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_public?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   price?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fr_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  en_description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -521,11 +547,12 @@ export type JerseysCountOutputTypeCountJersey_imagesArgs<ExtArgs extends runtime
 export type jerseysSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  description?: boolean
   is_public?: boolean
   price?: boolean
   created_at?: boolean
   updated_at?: boolean
+  fr_description?: boolean
+  en_description?: boolean
   jersey_images?: boolean | Prisma.jerseys$jersey_imagesArgs<ExtArgs>
   _count?: boolean | Prisma.JerseysCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["jerseys"]>
@@ -533,34 +560,37 @@ export type jerseysSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type jerseysSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  description?: boolean
   is_public?: boolean
   price?: boolean
   created_at?: boolean
   updated_at?: boolean
+  fr_description?: boolean
+  en_description?: boolean
 }, ExtArgs["result"]["jerseys"]>
 
 export type jerseysSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  description?: boolean
   is_public?: boolean
   price?: boolean
   created_at?: boolean
   updated_at?: boolean
+  fr_description?: boolean
+  en_description?: boolean
 }, ExtArgs["result"]["jerseys"]>
 
 export type jerseysSelectScalar = {
   id?: boolean
   name?: boolean
-  description?: boolean
   is_public?: boolean
   price?: boolean
   created_at?: boolean
   updated_at?: boolean
+  fr_description?: boolean
+  en_description?: boolean
 }
 
-export type jerseysOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "is_public" | "price" | "created_at" | "updated_at", ExtArgs["result"]["jerseys"]>
+export type jerseysOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "is_public" | "price" | "created_at" | "updated_at" | "fr_description" | "en_description", ExtArgs["result"]["jerseys"]>
 export type jerseysInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jersey_images?: boolean | Prisma.jerseys$jersey_imagesArgs<ExtArgs>
   _count?: boolean | Prisma.JerseysCountOutputTypeDefaultArgs<ExtArgs>
@@ -576,11 +606,12 @@ export type $jerseysPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
-    description: string | null
     is_public: boolean | null
     price: number | null
     created_at: Date | null
     updated_at: Date | null
+    fr_description: string | null
+    en_description: string | null
   }, ExtArgs["result"]["jerseys"]>
   composites: {}
 }
@@ -1007,11 +1038,12 @@ export interface Prisma__jerseysClient<T, Null = never, ExtArgs extends runtime.
 export interface jerseysFieldRefs {
   readonly id: Prisma.FieldRef<"jerseys", 'String'>
   readonly name: Prisma.FieldRef<"jerseys", 'String'>
-  readonly description: Prisma.FieldRef<"jerseys", 'String'>
   readonly is_public: Prisma.FieldRef<"jerseys", 'Boolean'>
   readonly price: Prisma.FieldRef<"jerseys", 'Int'>
   readonly created_at: Prisma.FieldRef<"jerseys", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"jerseys", 'DateTime'>
+  readonly fr_description: Prisma.FieldRef<"jerseys", 'String'>
+  readonly en_description: Prisma.FieldRef<"jerseys", 'String'>
 }
     
 
