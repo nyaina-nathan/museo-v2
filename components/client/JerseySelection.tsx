@@ -3,9 +3,13 @@
 import { useEffect, useState } from "react";
 import { JerseyCard } from "@/components/client/JerseyCard";
 import { JerseyCardSkeleton } from "@/components/client/JerseyCardSkeleton";
+import { useDictionary, useLocale } from "@/libs/i18n/locale-provider";
+import { localePath } from "@/libs/i18n/paths";
 import type { Jersey } from "@/types/jersey.types";
 
 export function JerseySelection() {
+  const locale = useLocale();
+  const dict = useDictionary();
   const [jerseys, setJerseys] = useState<Jersey[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +25,7 @@ export function JerseySelection() {
 
         if (!response.ok) {
           const body = await response.json().catch(() => null);
-          throw new Error(body?.message ?? "Failed to load the archive");
+          throw new Error(body?.message ?? dict.home.loadError);
         }
 
         const result = await response.json();
@@ -31,7 +35,9 @@ export function JerseySelection() {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Something went wrong");
+          setError(
+            err instanceof Error ? err.message : dict.collection.somethingWrong
+          );
         }
       } finally {
         if (!cancelled) {
@@ -45,7 +51,7 @@ export function JerseySelection() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [dict]);
 
   useEffect(() => {
     if (loading) return;
@@ -59,16 +65,14 @@ export function JerseySelection() {
       <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
         <div className="mb-8 flex items-center justify-between gap-4">
           <h2 className="font-display text-3xl font-bold text-primary md:text-4xl">
-            Our last drops
+            {dict.home.lastDrops}
           </h2>
         </div>
 
         {error && <p className="text-center text-primary-dark">{error}</p>}
 
         {!loading && !error && jerseys.length === 0 && (
-          <p className="text-center text-text-light">
-            Begin your archive. Explore our current pieces.
-          </p>
+          <p className="text-center text-text-light">{dict.home.empty}</p>
         )}
       </div>
 
@@ -76,7 +80,7 @@ export function JerseySelection() {
         <div className="grid grid-cols-1">
           {loading && (
             <span role="status" className="sr-only">
-              Loading our last drops…
+              {dict.home.loading}
             </span>
           )}
 
@@ -107,7 +111,7 @@ export function JerseySelection() {
                       <JerseyCard
                         key={jersey.id}
                         jersey={jersey}
-                        href={`/collection/${jersey.id}`}
+                        href={localePath(locale, `/collection/${jersey.id}`)}
                         liClassName="w-[280px] shrink-0"
                       />
                     ))}
@@ -121,7 +125,7 @@ export function JerseySelection() {
                       <JerseyCard
                         key={`${jersey.id}-duplicate`}
                         jersey={jersey}
-                        href={`/collection/${jersey.id}`}
+                        href={localePath(locale, `/collection/${jersey.id}`)}
                         liClassName="w-[280px] shrink-0"
                         tabIndex={-1}
                       />
@@ -138,7 +142,7 @@ export function JerseySelection() {
                     aria-pressed={paused}
                     className="text-xs font-medium text-text-light transition-colors hover:text-primary"
                   >
-                    {paused ? "Play" : "Pause"}
+                    {paused ? dict.home.play : dict.home.pause}
                   </button>
                 )}
               </div>

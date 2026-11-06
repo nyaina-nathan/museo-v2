@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Hanken_Grotesk, MuseoModerno } from "next/font/google";
+import { LOCALE_COOKIE, normalizeLocale } from "@/libs/i18n/config";
+import { getDictionary } from "@/libs/i18n/get-dictionary";
 import "./globals.css";
 
 const museoModerno = MuseoModerno({
@@ -12,15 +15,24 @@ const hankenGrotesk = Hanken_Grotesk({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Museo.mg",
-  description: "Ex vintage jersey",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const cookieStore = await cookies();
+  const locale = normalizeLocale(cookieStore.get(LOCALE_COOKIE)?.value);
+  const dict = getDictionary(locale);
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+  return {
+    title: dict.metadata.root.title,
+    description: dict.metadata.root.description,
+  };
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const cookieStore = await cookies();
+  const locale = normalizeLocale(cookieStore.get(LOCALE_COOKIE)?.value);
+
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${museoModerno.variable} ${hankenGrotesk.variable} h-full antialiased`}
     >
       <head>

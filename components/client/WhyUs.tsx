@@ -1,3 +1,6 @@
+import type { Locale } from "@/libs/i18n/config";
+import { getDictionary } from "@/libs/i18n/get-dictionary";
+
 type IconProps = { className?: string };
 
 function TrustSealIcon({ className }: IconProps) {
@@ -84,31 +87,19 @@ function SupporterHeartIcon({ className }: IconProps) {
   );
 }
 
-const PILLARS = [
-  {
-    title: "2 Years of Trust",
-    eyebrow: "Provenance",
-    description:
-      "Honest grading and fair pricing since day one, so collectors know exactly what they are buying.",
-    Icon: TrustSealIcon,
-  },
-  {
-    title: "100+ Jerseys in Circulation",
-    eyebrow: "The Archive",
-    description:
-      "Look closely at the stands at a local match. Chances are you will spot one of ours.",
-    Icon: JerseyArchiveIcon,
-  },
-  {
-    title: "Run by a Passionate Fan",
-    eyebrow: "Devotion",
-    description:
-      "Museo is run by a lifelong supporter and collector who treats every piece like their own.",
-    Icon: SupporterHeartIcon,
-  },
+const PILLAR_ICONS = [
+  TrustSealIcon,
+  JerseyArchiveIcon,
+  SupporterHeartIcon,
 ];
 
-export function WhyUs() {
+interface WhyUsProps {
+  locale: Locale;
+}
+
+export function WhyUs({ locale }: WhyUsProps) {
+  const dict = getDictionary(locale);
+
   return (
     <section className="relative overflow-hidden bg-primary py-20 text-white md:py-24">
       <div
@@ -118,10 +109,10 @@ export function WhyUs() {
       <div className="relative mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
         <div className="mx-auto mb-14 max-w-[600px] text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/70">
-            The Museo Standard
+            {dict.whyUs.eyebrow}
           </p>
           <h2 className="mt-3 font-display text-3xl font-bold tracking-[-0.02em] text-white md:text-4xl">
-            Why Museo
+            {dict.whyUs.title}
           </h2>
           <div
             className="mt-5 flex items-center justify-center gap-3"
@@ -132,12 +123,15 @@ export function WhyUs() {
             <span className="h-px w-10 bg-white/25" />
           </div>
           <p className="mt-5 text-base leading-relaxed text-white/80">
-            Vintage jerseys, held to a gallery standard.
+            {dict.whyUs.subtitle}
           </p>
         </div>
 
         <ul className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
-          {PILLARS.map((pillar, index) => (
+          {dict.whyUs.pillars.map((pillar, index) => {
+            const Icon = PILLAR_ICONS[index];
+
+            return (
             <li
               key={pillar.title}
               className="group relative flex w-full flex-col items-center overflow-hidden rounded-2xl border border-white/15 bg-white px-7 pb-9 pt-12 text-center shadow-[0_16px_36px_-12px_rgba(42,10,4,0.38)] transition-[translate,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:border-white/40 hover:shadow-[0_28px_56px_-20px_rgba(20,4,1,0.55)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
@@ -162,7 +156,7 @@ export function WhyUs() {
                   aria-hidden="true"
                   className="absolute -inset-[7px] rounded-full border border-dashed border-primary/25 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:rotate-45 motion-reduce:transition-none motion-reduce:group-hover:rotate-0"
                 />
-                <pillar.Icon className="relative h-9 w-9 text-primary transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-hover:scale-100" />
+                <Icon className="relative h-9 w-9 text-primary transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-hover:scale-100" />
               </span>
 
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-primary/70">
@@ -179,7 +173,8 @@ export function WhyUs() {
                 {pillar.description}
               </p>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </div>
     </section>

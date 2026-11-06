@@ -71,7 +71,7 @@ npx prisma db push
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) — the root route redirects to `/home`.
+Open [http://localhost:3000](http://localhost:3000) — the root route redirects to `/en/home` (or `/fr/home` when French is selected).
 
 ## Scripts
 
@@ -86,11 +86,12 @@ Open [http://localhost:3000](http://localhost:3000) — the root route redirects
 
 ```
 ├── app/
-│   ├── (client)/            # Public gallery pages
-│   │   ├── home/            # Homepage
-│   │   ├── collection/      # Collection grid + jersey detail ([collectionId])
-│   │   ├── about/           # About us
-│   │   └── faq/             # FAQ
+│   ├── (client)/
+│   │   └── [locale]/        # Public gallery pages (en / fr)
+│   │       ├── home/        # Homepage
+│   │       ├── collection/  # Collection grid + jersey detail ([collectionId])
+│   │       ├── about/       # About us
+│   │       └── faq/         # FAQ
 │   ├── admin/               # Admin dashboard (session required)
 │   │   └── jerseys/         # Jersey management + image handling
 │   ├── login/               # Login page
@@ -100,12 +101,12 @@ Open [http://localhost:3000](http://localhost:3000) — the root route redirects
 │   └── ui/                  # Shared UI primitives (Button)
 ├── services/                # Business logic (jersey.service, user.service)
 ├── validators/              # Request validation for API routes
-├── libs/                    # prisma, jwt/session helpers, api-handler, ImageKit client
+├── libs/                    # prisma, jwt/session helpers, api-handler, i18n, ImageKit client
 ├── hooks/                   # useImageKitUpload, useDebouncedValue
 ├── types/                   # Shared TypeScript types
 ├── prisma/                  # schema.prisma + generated client
 ├── docs/                    # OpenAPI spec, brand docs, SQL migrations
-├── proxy.ts                 # Edge middleware: session enforcement
+├── proxy.ts                 # Edge middleware: session enforcement + locale routing
 └── DESIGN.md                # Full brand & design system guide
 ```
 
@@ -116,6 +117,7 @@ Open [http://localhost:3000](http://localhost:3000) — the root route redirects
 - **Homepage** with hero section, featured selection, "why us", and social links
 - **Collection** grid with filtering (filters are debounced) and jersey detail pages
 - **About** and **FAQ** pages with an accordion component
+- Bilingual public pages (`/en/...` and `/fr/...`) with a persistent language switcher
 - All imagery served and optimized through ImageKit
 
 ### Admin dashboard

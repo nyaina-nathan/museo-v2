@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import { useDictionary } from "@/libs/i18n/locale-provider";
 
 export interface JerseyFiltersValue {
   name: string;
@@ -39,6 +40,8 @@ export function JerseyFilters({
   onReset,
   onClose,
 }: JerseyFiltersProps) {
+  const dict = useDictionary();
+
   const hasActiveFilters =
     value.name.trim() !== "" ||
     value.priceMin !== null ||
@@ -75,13 +78,13 @@ export function JerseyFilters({
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
         <h2 className="w-full text-center font-display text-lg font-bold text-primary">
-          Filters
+          {dict.filters.title}
         </h2>
 
         {onClose && (
           <button
             type="button"
-            aria-label="Close filters"
+            aria-label={dict.filters.close}
             onClick={onClose}
             className="rounded border border-border px-2 py-1 text-lg leading-none text-text-light transition-colors hover:border-primary hover:text-primary"
           >
@@ -91,12 +94,14 @@ export function JerseyFilters({
       </div>
 
       <label className="flex flex-col gap-2">
-        <span className="text-sm font-medium text-text-dark">Name</span>
+        <span className="text-sm font-medium text-text-dark">
+          {dict.filters.name}
+        </span>
         <input
           type="text"
           value={value.name}
           onChange={(event) => onNameChange(event.target.value)}
-          placeholder="Search pieces…"
+          placeholder={dict.filters.searchPlaceholder}
           className={inputStyles}
         />
       </label>
@@ -104,7 +109,7 @@ export function JerseyFilters({
       {bounds && lo !== null && hi !== null ? (
         <fieldset>
           <legend className="mb-2 text-sm font-medium text-text-dark">
-            Price range
+            {dict.filters.priceRange}
           </legend>
 
           <div className="dual-range">
@@ -120,7 +125,7 @@ export function JerseyFilters({
               max={bounds.max}
               step={1000}
               value={lo}
-              aria-label="Minimum price"
+              aria-label={dict.filters.minPrice}
               onChange={(event) => handleMinChange(Number(event.target.value))}
             />
             <input
@@ -129,7 +134,7 @@ export function JerseyFilters({
               max={bounds.max}
               step={1000}
               value={hi}
-              aria-label="Maximum price"
+              aria-label={dict.filters.maxPrice}
               onChange={(event) => handleMaxChange(Number(event.target.value))}
             />
           </div>
@@ -141,21 +146,23 @@ export function JerseyFilters({
       ) : (
         <fieldset>
           <legend className="mb-2 text-sm font-medium text-text-dark">
-            Price range
+            {dict.filters.priceRange}
           </legend>
           <p className="text-sm text-text-light">
-            Price filtering is unavailable right now.
+            {dict.filters.unavailable}
           </p>
         </fieldset>
       )}
 
       <fieldset className="flex flex-col gap-4">
         <legend className="mb-2 text-sm font-medium text-text-dark">
-          Sort
+          {dict.filters.sort}
         </legend>
 
         <label className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-text-dark">Order by</span>
+          <span className="text-sm font-medium text-text-dark">
+            {dict.filters.orderBy}
+          </span>
           <select
             value={value.orderBy}
             onChange={(event) =>
@@ -165,14 +172,16 @@ export function JerseyFilters({
             }
             className={inputStyles}
           >
-            <option value="createdAt">Created date</option>
-            <option value="name">Name</option>
-            <option value="price">Price</option>
+            <option value="createdAt">{dict.filters.createdDate}</option>
+            <option value="name">{dict.filters.nameOption}</option>
+            <option value="price">{dict.filters.price}</option>
           </select>
         </label>
 
         <label className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-text-dark">Order</span>
+          <span className="text-sm font-medium text-text-dark">
+            {dict.filters.order}
+          </span>
           <select
             value={value.order}
             onChange={(event) =>
@@ -180,8 +189,8 @@ export function JerseyFilters({
             }
             className={inputStyles}
           >
-            <option value="desc">Descending</option>
-            <option value="asc">Ascending</option>
+            <option value="desc">{dict.filters.descending}</option>
+            <option value="asc">{dict.filters.ascending}</option>
           </select>
         </label>
       </fieldset>
@@ -193,7 +202,7 @@ export function JerseyFilters({
         disabled={!hasActiveFilters}
         className="self-start"
       >
-        Reset filters
+        {dict.filters.reset}
       </Button>
     </div>
   );
