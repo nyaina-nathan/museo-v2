@@ -10,7 +10,7 @@ const HERO_IMAGES = [
 
 export function Hero() {
   return (
-    <section className="relative -mt-[75px] z-0 bg-primary text-white">
+    <section className="relative -mt-[65px] z-0 bg-primary text-white">
       <div className="grid h-[72vh] min-h-[560px] w-full grid-cols-3 gap-0 md:h-[64vh] md:min-h-0 md:gap-1">
         {HERO_IMAGES.map((image, index) => (
           <div

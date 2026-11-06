@@ -22,7 +22,7 @@ export function TopBanner() {
 
   return (
     <div className="bg-primary text-white">
-      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-[1fr_auto_1fr] items-center px-5 py-2 md:px-10 lg:px-[60px]">
+      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-[1fr_auto_1fr] items-center px-5 py-5 md:px-10 lg:px-[60px]">
         <div className="flex items-center gap-4">
           <SocialLinks linkClassName="text-white/70 transition-colors hover:text-white" />
         </div>

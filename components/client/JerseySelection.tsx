@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { JerseyCard } from "@/components/client/JerseyCard";
 import { JerseyCardSkeleton } from "@/components/client/JerseyCardSkeleton";
-import { Button } from "@/components/ui/Button";
 import type { Jersey } from "@/types/jersey.types";
 
 export function JerseySelection() {
@@ -63,11 +61,6 @@ export function JerseySelection() {
           <h2 className="font-display text-3xl font-bold text-primary md:text-4xl">
             Our last drops
           </h2>
-          <Link href="/collection">
-            <Button variant="secondary" size="sm">
-              View collection
-            </Button>
-          </Link>
         </div>
 
         {error && <p className="text-center text-primary-dark">{error}</p>}
