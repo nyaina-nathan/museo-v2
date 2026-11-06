@@ -89,21 +89,21 @@ const PILLARS = [
     title: "2 Years of Trust",
     eyebrow: "Provenance",
     description:
-      "Honest grading and fair pricing since day one, building a name collectors can rely on.",
+      "Honest grading and fair pricing since day one, so collectors know exactly what they are buying.",
     Icon: TrustSealIcon,
   },
   {
-    title: "100+ Match-Worn Jerseys",
+    title: "100+ Jerseys in Circulation",
     eyebrow: "The Archive",
     description:
-      "Over a hundred authentic match-worn shirts inspected, documented, and matched to the players who wore them.",
+      "Look closely at the stands at a local match. Chances are you will spot one of ours.",
     Icon: JerseyArchiveIcon,
   },
   {
     title: "Run by a Passionate Fan",
     eyebrow: "Devotion",
     description:
-      "Museo is run by a lifelong supporter and collector who cares about every shirt like their own.",
+      "Museo is run by a lifelong supporter and collector who treats every piece like their own.",
     Icon: SupporterHeartIcon,
   },
 ];
@@ -128,7 +128,7 @@ export function WhyUs() {
             <span className="h-px w-10 bg-primary/20" />
           </div>
           <p className="mt-5 text-base leading-relaxed text-text-light">
-            A gallery standard applied to the world of vintage jerseys.
+            Vintage jerseys, held to a gallery standard.
           </p>
         </div>
 
