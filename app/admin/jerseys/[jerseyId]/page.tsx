@@ -20,7 +20,8 @@ export default function JerseyDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [enDescription, setEnDescription] = useState("");
+  const [frDescription, setFrDescription] = useState("");
   const [price, setPrice] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -74,7 +75,8 @@ export default function JerseyDetailPage() {
 
         setJersey(jerseyData);
         setName(jerseyData.name);
-        setDescription(jerseyData.description ?? "");
+        setEnDescription(jerseyData.en_description ?? "");
+        setFrDescription(jerseyData.fr_description ?? "");
         setPrice(jerseyData.price === null ? "" : String(jerseyData.price));
         setIsPublic(jerseyData.is_public);
 
@@ -111,7 +113,8 @@ export default function JerseyDetailPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
-          description: description === "" ? null : description,
+          en_description: enDescription === "" ? null : enDescription,
+          fr_description: frDescription === "" ? null : frDescription,
           price: price === "" ? null : Number(price),
           is_public: isPublic,
         }),
@@ -358,10 +361,19 @@ export default function JerseyDetailPage() {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Description</span>
+          <span className="text-sm font-medium">English description</span>
           <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={enDescription}
+            onChange={(e) => setEnDescription(e.target.value)}
+            className={inputStyles}
+          />
+        </label>
+
+        <label className="flex flex-col gap-1">
+          <span className="text-sm font-medium">French description</span>
+          <textarea
+            value={frDescription}
+            onChange={(e) => setFrDescription(e.target.value)}
             className={inputStyles}
           />
         </label>

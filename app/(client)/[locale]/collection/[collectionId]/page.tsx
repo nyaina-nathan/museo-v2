@@ -8,6 +8,7 @@ import { JerseyDetailSkeleton } from "@/components/client/JerseyDetailSkeleton";
 import { SocialLinks } from "@/components/client/SocialLinks";
 import { Button } from "@/components/ui/Button";
 import { formatMessage } from "@/libs/i18n/format";
+import { localizeDescription } from "@/libs/i18n/jersey-description";
 import { useDictionary, useLocale } from "@/libs/i18n/locale-provider";
 import { localePath } from "@/libs/i18n/paths";
 import type { Jersey, JerseyImage } from "@/types/jersey.types";
@@ -114,6 +115,7 @@ export default function CollectionDetailPage() {
     return null;
   }
 
+  const description = localizeDescription(jersey, locale);
   const activeImage =
     images.find((image) => image.id === activeImageId) ??
     images.find((image) => image.is_primary) ??
@@ -201,7 +203,7 @@ export default function CollectionDetailPage() {
                 )}
 
                 <p className="mt-6 max-w-prose text-base leading-relaxed text-text-light">
-                  {jersey.description ?? dict.detail.noDescription}
+                  {description ?? dict.detail.noDescription}
                 </p>
 
                 <div className="mt-8 flex items-center gap-3">

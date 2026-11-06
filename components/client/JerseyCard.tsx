@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Locale } from "@/libs/i18n/config";
+import { localizeDescription } from "@/libs/i18n/jersey-description";
 import { useDictionary, useLocale } from "@/libs/i18n/locale-provider";
 import type { Jersey } from "@/types/jersey.types";
 
@@ -20,6 +21,7 @@ const priceFormatters: Record<Locale, Intl.NumberFormat> = {
 export function JerseyCard({ jersey, href, liClassName, tabIndex }: JerseyCardProps) {
   const locale = useLocale();
   const dict = useDictionary();
+  const description = localizeDescription(jersey, locale);
   const formattedPrice =
     jersey.price !== null
       ? `Ar ${priceFormatters[locale].format(jersey.price)}`
@@ -52,9 +54,9 @@ export function JerseyCard({ jersey, href, liClassName, tabIndex }: JerseyCardPr
           {jersey.name}
         </h3>
 
-        {jersey.description ? (
+        {description ? (
           <p className="mt-1.5 mb-4 line-clamp-2 text-xs leading-[1.5] text-text-light">
-            {jersey.description}
+            {description}
           </p>
         ) : (
           <p className="mt-1.5 mb-4 text-xs italic leading-[1.5] text-text-light/60">
