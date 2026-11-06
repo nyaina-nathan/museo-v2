@@ -127,7 +127,7 @@ export function JerseySelection() {
             <ul
               ref={scrollRef}
               onScroll={updateScrollState}
-              className="[grid-area:1/1] flex min-w-0 snap-x gap-6 overflow-x-auto px-5 pb-2 scroll-smooth [scrollbar-width:none] animate-rail-in motion-reduce:animate-none md:px-10 lg:px-[60px] [&::-webkit-scrollbar]:hidden"
+              className="[grid-area:1/1] flex min-w-0 snap-x gap-6 overflow-x-auto px-5 pb-2 scroll-smooth [scrollbar-width:none] animate-content-in motion-reduce:animate-none md:px-10 lg:px-[60px] [&::-webkit-scrollbar]:hidden"
             >
               {jerseys.map((jersey) => (
                 <JerseyCard
