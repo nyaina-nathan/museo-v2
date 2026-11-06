@@ -110,24 +110,28 @@ const PILLARS = [
 
 export function WhyUs() {
   return (
-    <section className="bg-primary/11 py-20 md:py-24">
-      <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
+    <section className="relative overflow-hidden bg-primary py-20 text-white md:py-24">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--color-primary-light)_0%,transparent_70%)] opacity-45"
+      />
+      <div className="relative mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
         <div className="mx-auto mb-14 max-w-[600px] text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-primary/70">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/70">
             The Museo Standard
           </p>
-          <h2 className="mt-3 font-display text-3xl font-bold text-primary md:text-4xl">
+          <h2 className="mt-3 font-display text-3xl font-bold tracking-[-0.02em] text-white md:text-4xl">
             Why Museo
           </h2>
           <div
             className="mt-5 flex items-center justify-center gap-3"
             aria-hidden="true"
           >
-            <span className="h-px w-10 bg-primary/20" />
-            <span className="h-1.5 w-1.5 rotate-45 border border-primary/40" />
-            <span className="h-px w-10 bg-primary/20" />
+            <span className="h-px w-10 bg-white/25" />
+            <span className="h-1.5 w-1.5 rotate-45 border border-white/50" />
+            <span className="h-px w-10 bg-white/25" />
           </div>
-          <p className="mt-5 text-base leading-relaxed text-text-light">
+          <p className="mt-5 text-base leading-relaxed text-white/80">
             Vintage jerseys, held to a gallery standard.
           </p>
         </div>
@@ -136,24 +140,24 @@ export function WhyUs() {
           {PILLARS.map((pillar, index) => (
             <li
               key={pillar.title}
-              className="group relative flex w-full flex-col items-center overflow-hidden rounded-2xl border border-primary/10 bg-white px-7 pb-9 pt-12 text-center shadow-[0_1px_2px_rgba(120,29,10,0.04)] transition-[translate,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:border-primary/25 hover:shadow-[0_24px_48px_-24px_rgba(120,29,10,0.32)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+              className="group relative flex w-full flex-col items-center overflow-hidden rounded-2xl border border-white/15 bg-white px-7 pb-9 pt-12 text-center shadow-[0_16px_36px_-12px_rgba(42,10,4,0.38)] transition-[translate,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:border-white/40 hover:shadow-[0_28px_56px_-20px_rgba(20,4,1,0.55)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-2.5 rounded-xl border border-primary/[0.07] transition-colors duration-500 group-hover:border-primary/15"
+                className="pointer-events-none absolute inset-2.5 rounded-xl border border-primary/10 transition-colors duration-500 group-hover:border-primary/20"
               />
               <span
                 aria-hidden="true"
-                className="absolute left-5 top-5 font-display text-[11px] font-semibold tracking-[0.28em] text-primary/30"
+                className="absolute left-5 top-5 font-display text-[11px] font-semibold tracking-[0.28em] text-primary/35"
               >
                 {String(index + 1).padStart(2, "0")}
               </span>
               <span
                 aria-hidden="true"
-                className="absolute right-5 top-6 h-1 w-1 rounded-full bg-primary/25 transition-colors duration-500 group-hover:bg-primary/50"
+                className="absolute right-5 top-6 h-1 w-1 rounded-full bg-primary/30 transition-colors duration-500 group-hover:bg-primary/60"
               />
 
-              <span className="relative mb-6 grid h-[76px] w-[76px] place-items-center rounded-full bg-primary/[0.04] ring-1 ring-primary/10">
+              <span className="relative mb-6 grid h-[76px] w-[76px] place-items-center rounded-full bg-primary/[0.05] ring-1 ring-primary/15">
                 <span
                   aria-hidden="true"
                   className="absolute -inset-[7px] rounded-full border border-dashed border-primary/25 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:rotate-45 motion-reduce:transition-none motion-reduce:group-hover:rotate-0"
