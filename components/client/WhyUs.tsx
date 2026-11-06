@@ -110,7 +110,7 @@ const PILLARS = [
 
 export function WhyUs() {
   return (
-    <section className="bg-primary/5 py-20 md:py-24">
+    <section className="bg-primary/11 py-20 md:py-24">
       <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
         <div className="mx-auto mb-14 max-w-[600px] text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-primary/70">
