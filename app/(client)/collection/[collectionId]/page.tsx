@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/client/Header";
 import { Footer } from "@/components/client/Footer";
+import { JerseyDetailSkeleton } from "@/components/client/JerseyDetailSkeleton";
 import { SocialLinks } from "@/components/client/SocialLinks";
 import { Button } from "@/components/ui/Button";
 import type { Jersey, JerseyImage } from "@/types/jersey.types";
@@ -71,7 +72,7 @@ export default function CollectionDetailPage() {
       <div className="flex min-h-full flex-col">
         <Header />
         <main className="flex-1">
-          <p className="py-24 text-center text-text-light">Loading...</p>
+          <JerseyDetailSkeleton />
         </main>
         <Footer />
       </div>
@@ -118,7 +119,7 @@ export default function CollectionDetailPage() {
       <Header />
       <main className="flex-1">
         <section className="bg-white py-20">
-          <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:px-[60px]">
+          <div className="mx-auto w-full max-w-[1280px] animate-content-in px-5 md:px-10 lg:px-[60px] motion-reduce:animate-none">
             <Button
               variant="ghost"
               size="sm"
