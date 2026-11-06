@@ -16,6 +16,16 @@
   --animate-icon-scale: icon-scale 1s ease-in-out;
   --animate-skeleton-shimmer: skeleton-shimmer 1.4s linear infinite;
   --animate-content-in: content-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-marquee: marquee 60s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
 
   @keyframes skeleton-shimmer {
     from {

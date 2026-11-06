@@ -5,9 +5,10 @@ interface JerseyCardProps {
   jersey: Jersey;
   href?: string;
   liClassName?: string;
+  tabIndex?: number;
 }
 
-export function JerseyCard({ jersey, href, liClassName }: JerseyCardProps) {
+export function JerseyCard({ jersey, href, liClassName, tabIndex }: JerseyCardProps) {
   const content = (
     <div className="my-2 h-full  border-2 border-primary bg-white p-3">
       <div className="mb-3 flex aspect-square w-full items-center justify-center overflow-hidden rounded bg-primary/5">
@@ -35,7 +36,7 @@ export function JerseyCard({ jersey, href, liClassName }: JerseyCardProps) {
   if (href) {
     return (
       <li className={`h-full ${liClassName ?? ""}`}>
-        <Link href={href} className="block h-full">
+        <Link href={href} tabIndex={tabIndex} className="block h-full">
           {content}
         </Link>
       </li>

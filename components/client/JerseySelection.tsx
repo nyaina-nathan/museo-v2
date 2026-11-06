@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { JerseyCard } from "@/components/client/JerseyCard";
 import { JerseyCardSkeleton } from "@/components/client/JerseyCardSkeleton";
 import { Button } from "@/components/ui/Button";
@@ -11,26 +11,8 @@ export function JerseySelection() {
   const [jerseys, setJerseys] = useState<Jersey[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true);
-  const scrollRef = useRef<HTMLUListElement>(null);
-
-  function updateScrollState() {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    setCanScrollLeft(el.scrollLeft > 1);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
-  }
-
-  function scrollBy(direction: "left" | "right") {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    const amount = el.clientWidth * 0.8;
-    el.scrollBy({ left: direction === "left" ? -amount : amount, behavior: "smooth" });
-  }
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -73,12 +55,6 @@ export function JerseySelection() {
     const timer = window.setTimeout(() => setShowSkeleton(false), 260);
     return () => window.clearTimeout(timer);
   }, [loading]);
-
-  useEffect(() => {
-    updateScrollState();
-    window.addEventListener("resize", updateScrollState);
-    return () => window.removeEventListener("resize", updateScrollState);
-  }, [jerseys]);
 
   return (
     <section className="bg-white py-20" aria-busy={loading}>
@@ -124,20 +100,56 @@ export function JerseySelection() {
           </ul>
 
           {!loading && !error && jerseys.length > 0 && (
-            <ul
-              ref={scrollRef}
-              onScroll={updateScrollState}
-              className="[grid-area:1/1] flex min-w-0 snap-x gap-6 overflow-x-auto px-5 pb-2 scroll-smooth [scrollbar-width:none] animate-content-in motion-reduce:animate-none md:px-10 lg:px-[60px] [&::-webkit-scrollbar]:hidden"
-            >
-              {jerseys.map((jersey) => (
-                <JerseyCard
-                  key={jersey.id}
-                  jersey={jersey}
-                  href={`/collection/${jersey.id}`}
-                  liClassName="w-[280px] shrink-0"
-                />
-              ))}
-            </ul>
+            <>
+              <div className="[grid-area:1/1] min-w-0 overflow-hidden px-5 pb-2 animate-content-in motion-reduce:animate-none motion-reduce:overflow-x-auto motion-reduce:[scrollbar-width:none] md:px-10 lg:px-[60px] motion-reduce:[&::-webkit-scrollbar]:hidden">
+                <div
+                  className={`flex w-max gap-6 pr-6 will-change-transform animate-marquee motion-reduce:animate-none motion-reduce:will-change-auto ${
+                    paused
+                      ? "[animation-play-state:paused]"
+                      : "focus-within:[animation-play-state:paused] hover:[animation-play-state:paused]"
+                  }`}
+                >
+                  <ul className="flex shrink-0 gap-6">
+                    {jerseys.map((jersey) => (
+                      <JerseyCard
+                        key={jersey.id}
+                        jersey={jersey}
+                        href={`/collection/${jersey.id}`}
+                        liClassName="w-[280px] shrink-0"
+                      />
+                    ))}
+                  </ul>
+
+                  <ul
+                    aria-hidden="true"
+                    className="flex shrink-0 gap-6 motion-reduce:hidden"
+                  >
+                    {jerseys.map((jersey) => (
+                      <JerseyCard
+                        key={`${jersey.id}-duplicate`}
+                        jersey={jersey}
+                        href={`/collection/${jersey.id}`}
+                        liClassName="w-[280px] shrink-0"
+                        tabIndex={-1}
+                      />
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="mt-3 flex h-4 justify-end px-5 motion-reduce:hidden md:px-10 lg:px-[60px]">
+                {!loading && (
+                  <button
+                    type="button"
+                    onClick={() => setPaused((value) => !value)}
+                    aria-pressed={paused}
+                    className="text-xs font-medium text-text-light transition-colors hover:text-primary"
+                  >
+                    {paused ? "Play" : "Pause"}
+                  </button>
+                )}
+              </div>
+            </>
           )}
         </div>
       )}
