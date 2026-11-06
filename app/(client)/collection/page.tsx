@@ -321,7 +321,7 @@ export default function CollectionPage() {
                           refreshing ? "pointer-events-none opacity-50" : ""
                         }`}
                       >
-                        <ul className="grid animate-content-in grid-cols-2 gap-6 motion-reduce:animate-none lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                        <ul className="grid animate-content-in grid-cols-1 gap-6 motion-reduce:animate-none lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                           {jerseys.map((jersey) => (
                             <JerseyCard
                               key={jersey.id}
