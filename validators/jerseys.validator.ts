@@ -49,13 +49,16 @@ function validateName(value: unknown): string {
   return value;
 }
 
-function validateDescription(value: unknown): string | null {
+function validateDescription(
+  value: unknown,
+  field: "en_description" | "fr_description"
+): string | null {
   if (value !== null && typeof value !== "string") {
     throw new ApiError({
       title: "Validation Error",
-      message: "Invalid 'description' field",
+      message: `Invalid '${field}' field`,
       status: 422,
-      details: { description: "must be a string or null" },
+      details: { [field]: "must be a string or null" },
     });
   }
 
@@ -108,8 +111,18 @@ export async function validateCreateJerseyInput(req: NextRequest): Promise<Jerse
     name: validateName(body.name),
   };
 
-  if (body.description !== undefined) {
-    input.description = validateDescription(body.description);
+  if (body.en_description !== undefined) {
+    input.en_description = validateDescription(
+      body.en_description,
+      "en_description"
+    );
+  }
+
+  if (body.fr_description !== undefined) {
+    input.fr_description = validateDescription(
+      body.fr_description,
+      "fr_description"
+    );
   }
 
   if (body.is_public !== undefined) {
@@ -132,8 +145,18 @@ export async function validatePatchJerseyInput(req: NextRequest): Promise<Jersey
     patch.name = validateName(body.name);
   }
 
-  if (body.description !== undefined) {
-    patch.description = validateDescription(body.description);
+  if (body.en_description !== undefined) {
+    patch.en_description = validateDescription(
+      body.en_description,
+      "en_description"
+    );
+  }
+
+  if (body.fr_description !== undefined) {
+    patch.fr_description = validateDescription(
+      body.fr_description,
+      "fr_description"
+    );
   }
 
   if (body.is_public !== undefined) {
@@ -149,7 +172,9 @@ export async function validatePatchJerseyInput(req: NextRequest): Promise<Jersey
       title: "Validation Error",
       message: "Request body must contain at least one field to update",
       status: 422,
-      details: { body: "at least one of 'name', 'description', 'is_public', 'price' is required" },
+      details: {
+        body: "at least one of 'name', 'en_description', 'fr_description', 'is_public', 'price' is required",
+      },
     });
   }
 

@@ -697,7 +697,11 @@ components:
           format: uuid
         name:
           type: string
-        description:
+        en_description:
+          type:
+            - string
+            - 'null'
+        fr_description:
           type:
             - string
             - 'null'
@@ -746,7 +750,11 @@ components:
         name:
           type: string
           minLength: 1
-        description:
+        en_description:
+          type:
+            - string
+            - 'null'
+        fr_description:
           type:
             - string
             - 'null'
@@ -766,7 +774,11 @@ components:
         name:
           type: string
           minLength: 1
-        description:
+        en_description:
+          type:
+            - string
+            - 'null'
+        fr_description:
           type:
             - string
             - 'null'
