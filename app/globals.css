@@ -4,7 +4,7 @@
   --color-primary: #781d0a;
   --color-primary-light: #a8341d;
   --color-primary-dark: #5a1507;
-  --color-white: #ffffff;
+  --color-white: #FAFAFF;
   --color-text-dark: #2a2a2a;
   --color-text-light: #666666;
   --color-border: #e8e8e8;
@@ -14,6 +14,38 @@
   --animate-icon-bounce-up: icon-bounce-up 1s ease-in-out;
   --animate-icon-rotate: icon-rotate 0.6s ease-in-out;
   --animate-icon-scale: icon-scale 1s ease-in-out;
+  --animate-skeleton-shimmer: skeleton-shimmer 1.4s linear infinite;
+  --animate-content-in: content-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-marquee: marquee 60s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes skeleton-shimmer {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes content-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   @keyframes banner-message {
     from {

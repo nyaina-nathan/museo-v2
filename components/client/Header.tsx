@@ -62,19 +62,15 @@ export function Header({ transparentOnTop = false }: HeaderProps) {
             </Link>
           ))}
         </nav>
-          <Link href='/collection'>
-        <Button
-          size="sm"
-          variant="secondary"
-          className={
-            transparent
-              ? "border-white bg-transparent text-white hover:bg-white hover:text-primary"
-              : undefined
-          }
-        >
-          Explore the archive
-        </Button>
-          </Link>
+          <button
+             className={`text-sm font-medium transition-colors cursor-pointer ${
+                transparent
+                  ? "text-white hover:text-white/80"
+                  : "text-text-dark hover:text-primary"
+              }`}
+          >
+            FR/EN
+          </button>
       </div>
     </header>
   );

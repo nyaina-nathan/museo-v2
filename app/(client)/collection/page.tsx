@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Header } from "@/components/client/Header";
 import { Footer } from "@/components/client/Footer";
 import { JerseyCard } from "@/components/client/JerseyCard";
+import { JerseyCardSkeleton } from "@/components/client/JerseyCardSkeleton";
 import {
   JerseyFilters,
   type JerseyFiltersValue,
@@ -20,6 +21,7 @@ export default function CollectionPage() {
   const [jerseys, setJerseys] = useState<Jersey[]>([]);
   const [total, setTotal] = useState(0);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bounds, setBounds] = useState<PriceBounds | null>(null);
@@ -125,6 +127,13 @@ export default function CollectionPage() {
     load();
   }, [debouncedName, debouncedPriceMin, debouncedPriceMax, orderBy, order, page]);
 
+  useEffect(() => {
+    if (initialLoading) return;
+
+    const timer = window.setTimeout(() => setShowSkeleton(false), 260);
+    return () => window.clearTimeout(timer);
+  }, [initialLoading]);
+
   const trimmedName = name.trim();
   const hasPriceFilter = priceMin !== null || priceMax !== null;
   const hasSort = orderBy !== "createdAt" || order !== "desc";
@@ -176,7 +185,7 @@ export default function CollectionPage() {
     <div className="flex min-h-full flex-col">
       <Header />
       <main className="flex-1">
-        <section className="bg-white py-20">
+        <section className="bg-white py-20" aria-busy={initialLoading}>
           <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10 lg:max-w-none lg:px-[60px]">
             <div className="mx-auto mb-12 max-w-[600px] text-center">
               <h1 className="font-display text-3xl font-bold text-primary md:text-4xl">
@@ -259,10 +268,6 @@ export default function CollectionPage() {
                   )}
                 </div>
 
-                {initialLoading && (
-                  <p className="text-center text-text-light">Loading...</p>
-                )}
-
                 {error && (
                   <p className="text-center text-primary-dark">{error}</p>
                 )}
@@ -288,26 +293,50 @@ export default function CollectionPage() {
                     </p>
                   ))}
 
-                {!initialLoading && !error && jerseys.length > 0 && (
-                  <div
-                    className={`transition-opacity ${
-                      refreshing ? "pointer-events-none opacity-50" : ""
-                    }`}
-                  >
-                    <ul className="grid grid-cols-2 gap-6 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                      {jerseys.map((jersey) => (
-                        <JerseyCard
-                          key={jersey.id}
-                          jersey={jersey}
-                          href={`/collection/${jersey.id}`}
-                        />
-                      ))}
+                {(initialLoading || (!error && jerseys.length > 0)) && (
+                  <div className="relative grid grid-cols-1">
+                    {initialLoading && (
+                      <span role="status" className="sr-only">
+                        Loading the collection…
+                      </span>
+                    )}
+
+                    <ul
+                      aria-hidden="true"
+                      className={`[grid-area:1/1] grid grid-cols-2 gap-6 transition-opacity duration-200 ease-out motion-reduce:transition-none lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 ${
+                        initialLoading
+                          ? "opacity-100"
+                          : "pointer-events-none absolute inset-x-0 top-0 max-h-full overflow-hidden opacity-0"
+                      }`}
+                    >
+                      {showSkeleton &&
+                        Array.from({ length: PAGE_SIZE }, (_, index) => (
+                          <JerseyCardSkeleton key={index} />
+                        ))}
                     </ul>
 
-                    {refreshing && (
-                      <p className="mt-6 text-center text-sm text-text-light">
-                        Refreshing…
-                      </p>
+                    {!initialLoading && !error && jerseys.length > 0 && (
+                      <div
+                        className={`[grid-area:1/1] min-w-0 transition-opacity ${
+                          refreshing ? "pointer-events-none opacity-50" : ""
+                        }`}
+                      >
+                        <ul className="grid animate-content-in grid-cols-2 gap-6 motion-reduce:animate-none lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                          {jerseys.map((jersey) => (
+                            <JerseyCard
+                              key={jersey.id}
+                              jersey={jersey}
+                              href={`/collection/${jersey.id}`}
+                            />
+                          ))}
+                        </ul>
+
+                        {refreshing && (
+                          <p className="mt-6 text-center text-sm text-text-light">
+                            Refreshing…
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}
